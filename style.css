@@ -10,10 +10,18 @@ body {
 }
 
 .wheel text {
-  font-size: 6px;
+  font-size: 0.8rem;         /* Or 1rem, or 12px, or whatever feels right */
+  user-select: text;
+  cursor: text;
   text-anchor: middle;
   dominant-baseline: middle;
-  user-select: text;
+  font-family: sans-serif;
+  fill: black;
   -webkit-user-select: text;
-  cursor: text;
+}
+
+.wheel {
+  width: 80vmin;  /* Responsive based on viewport */
+  height: auto;
+  display: block;
 }
