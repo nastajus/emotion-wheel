@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #111;
+}
+
+.wheel {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+}
+
+.slice {
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  background: hsl(var(--hue), 100%, 60%);
+  top: 50%;
+  left: 50%;
+  transform-origin: left center;
+}
