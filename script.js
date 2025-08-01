@@ -3,7 +3,9 @@
 // Step 1: Generate hierarchical data with 3 levels
 
 // === Option 1: Literal Emotion Tree (future multilingual support) ===
-import { literalEmotionTree } from './emotionTreeData.js';
+//import { literalEmotionTree } from './emotionTreeDataTest.js';
+import { literalEmotionTree } from './emotionTreeDataJunto.js';
+
 
 // === Option 2: Generated Random Emotion Tree ===
 function generateEmotionTree() {

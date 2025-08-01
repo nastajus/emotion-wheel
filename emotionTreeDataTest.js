@@ -1,5 +1,3 @@
-// emotionTreeData.js
-
 export const literalEmotionTree = [
   {
     name: "Joy",
