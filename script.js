@@ -3,68 +3,7 @@
 // Step 1: Generate hierarchical data with 3 levels
 
 // === Option 1: Literal Emotion Tree (future multilingual support) ===
-const literalEmotionTree = [
-  {
-    name: "Joy",
-    //baseHue: 60, // pastel yellow
-    translations: { fr: "Joie", es: "Alegría" },
-    children: [
-      {
-        name: "Peaceful",
-        children: [
-          { name: "Content" },
-          { name: "Serene" }
-        ]
-      },
-      {
-        name: "Excited",
-        children: [
-          { name: "Eager" },
-          { name: "Energetic" }
-        ]
-      }
-    ]
-  },
-  {
-    name: "Trust",
-    //baseHue: 120, // pastel green
-    children: [
-      {
-        name: "Affectionate",
-        children: [
-          { name: "Loving" },
-          { name: "Caring" }
-        ]
-      }
-    ]
-  },
-  {
-  name: "asdf",
-  //baseHue: 240,  //idk
-  children: [
-    {
-      name: "asdasdf",
-      children: [
-        { name: "235434" },
-        { name: "23423" }
-      ]
-    }
-  ]
-  },
-//   {
-//   name: "asdf",
-//   //baseHue: 300,  //idk
-//   children: [
-//     {
-//       name: "asdasdf",
-//       children: [
-//         { name: "235434" },
-//         { name: "23423" }
-//       ]
-//     }
-//   ]
-//   },
-];
+import { literalEmotionTree } from './emotionTreeData.js';
 
 // === Option 2: Generated Random Emotion Tree ===
 function generateEmotionTree() {
