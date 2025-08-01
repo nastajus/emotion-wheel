@@ -6,7 +6,7 @@
 const literalEmotionTree = [
   {
     name: "Joy",
-    baseHue: 60, // pastel yellow
+    //baseHue: 60, // pastel yellow
     translations: { fr: "Joie", es: "Alegría" },
     children: [
       {
@@ -27,7 +27,7 @@ const literalEmotionTree = [
   },
   {
     name: "Trust",
-    baseHue: 120, // pastel green
+    //baseHue: 120, // pastel green
     children: [
       {
         name: "Affectionate",
@@ -38,22 +38,22 @@ const literalEmotionTree = [
       }
     ]
   },
+  {
+  name: "asdf",
+  //baseHue: 240,  //idk
+  children: [
+    {
+      name: "asdasdf",
+      children: [
+        { name: "235434" },
+        { name: "23423" }
+      ]
+    }
+  ]
+  },
 //   {
 //   name: "asdf",
-//   baseHue: 240,  //idk
-//   children: [
-//     {
-//       name: "asdasdf",
-//       children: [
-//         { name: "235434" },
-//         { name: "23423" }
-//       ]
-//     }
-//   ]
-//   },
-//   {
-//   name: "asdf",
-//   baseHue: 300,  //idk
+//   //baseHue: 300,  //idk
 //   children: [
 //     {
 //       name: "asdasdf",
@@ -154,6 +154,15 @@ function generateVisualNodes(emotionTree) {
   const fullCircle = 2 * Math.PI;
   let parentStartAngle = 0;
 
+  // Assign baseHues evenly spaced if not already defined
+  const baseHueStep = 360 / totalParents;
+  for (let i = 0; i < totalParents; i++) {
+    if (typeof emotionTree[i].baseHue !== 'number') {
+      emotionTree[i].baseHue = (i * baseHueStep) % 360;
+    }
+  }
+
+  // Now continue with existing visual node logic...
   for (let i = 0; i < totalParents; i++) {
     const parent = emotionTree[i];
     const nextParent = emotionTree[(i + 1) % totalParents];
