@@ -89,7 +89,10 @@ const emotionTree = useLiteral ? literalEmotionTree : generateEmotionTree();
 
 // Step 2: Convert HSL hue to pastel color
 function pastelFromHue(hue, fadeLevel = 0) {
-  if (typeof hue !== 'number' || isNaN(hue)) return 'hsl(0, 0%, 80%)';
+  if (typeof hue !== 'number' || isNaN(hue)) {
+    console.warn('Invalid hue passed to pastelFromHue:', hue);
+    return 'hsl(0, 0%, 80%)'; // fallback gray
+  }
 
   const maxFade = 2;
   const fade = Math.min(fadeLevel, maxFade);
@@ -122,9 +125,12 @@ function blendHueCircular(baseHue, targetHue, blendRatio) {
 
 // Step 4: Calculate hue for middle/outer levels based on parent's hue and position
 function deriveHue(baseHue, index, total, neighborLeft, neighborRight) {
-  const offset = ((index / (total - 1)) - 0.5) * 2; // -1 to 1
+  if (total <= 1) return baseHue; // No need to blend with neighbors
+
+  const offset = ((index / (total - 1)) - 0.5) * 2;
   const neighborTarget = offset < 0 ? neighborLeft : neighborRight;
-  const blendRatio = Math.abs(offset) * 0.3; // max 30% toward neighbor
+  const blendRatio = Math.abs(offset) * 0.3;
+
   return blendHueCircular(baseHue, neighborTarget, blendRatio);
 }
 
@@ -152,38 +158,49 @@ function generateVisualNodes(emotionTree) {
       color: parentColor
     });
 
-    const middle = parent.children;
+    const middle = parent.children ?? [];
     let middleStartAngle = parentStartAngle;
 
     for (let j = 0; j < middle.length; j++) {
       const middleSweep = parentSweep / middle.length;
+      const midHue = deriveHue(
+        parent.baseHue ?? 0,
+        j,
+        middle.length,
+        prevParent.baseHue ?? 0,
+        nextParent.baseHue ?? 0
+      );
 
-      const neighborLeftHue = prevParent?.baseHue ?? parentHue;
-      const neighborRightHue = nextParent?.baseHue ?? parentHue;
-      const midHue = deriveHue(parentHue, j, middle.length, neighborLeftHue, neighborRightHue);
+      if (typeof midHue !== 'number' || isNaN(midHue)) {
+      console.warn('Invalid midHue', {
+          parent: parent.name,
+          middleIndex: j,
+          totalMiddles: middle.length,
+          baseHue: parent.baseHue,
+          prevHue: prevParent.baseHue,
+          nextHue: nextParent.baseHue
+      });
+      }
+
       const midColor = pastelFromHue(midHue, 1);
-
-      middle[j].hue = midHue;
 
       visualNodes.push({
         label: middle[j].name,
         depth: 1,
         angle: middleStartAngle,
         sweep: middleSweep,
-        color: midColor,
-        hue: midHue // store hue for children to inherit
+        color: midColor
       });
 
-      const outer = middle[j].children;
+      const outer = middle[j].children ?? [];
       const outerSweep = middleSweep / outer.length;
       let outerStartAngle = middleStartAngle;
 
-      const lastMiddleNode = visualNodes[visualNodes.length - 1];
-      const effectiveHue = lastMiddleNode.hue ?? parentHue ?? 0;
-
       for (let k = 0; k < outer.length; k++) {
-        const childObj = typeof outer[k] === 'string' ? { name: outer[k] } : outer[k];
-        const effectiveHue = middle[j].hue ?? parentHue ?? 0;
+        const childObj =
+          typeof outer[k] === "string" ? { name: outer[k] } : outer[k];
+
+        // Derive hue safely from child > middle > parent
         const outerHue = childObj.baseHue ?? midHue ?? parentHue ?? 0;
         const outerColor = pastelFromHue(outerHue, 2);
 
@@ -196,7 +213,6 @@ function generateVisualNodes(emotionTree) {
         });
 
         outerStartAngle += outerSweep;
-        console.log("Label:", childObj.name, "Hue:", outerHue, "Color:", pastelFromHue(outerHue, 2));
       }
 
       middleStartAngle += middleSweep;
