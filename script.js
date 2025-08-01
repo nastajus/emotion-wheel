@@ -50,7 +50,20 @@ const literalEmotionTree = [
 //       ]
 //     }
 //   ]
-//   }
+//   },
+//   {
+//   name: "asdf",
+//   baseHue: 300,  //idk
+//   children: [
+//     {
+//       name: "asdasdf",
+//       children: [
+//         { name: "235434" },
+//         { name: "23423" }
+//       ]
+//     }
+//   ]
+//   },
 ];
 
 // === Option 2: Generated Random Emotion Tree ===
