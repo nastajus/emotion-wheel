@@ -41,7 +41,8 @@ function deriveHue(baseHue, index, total, neighborLeft, neighborRight) {
   const blendRange = 20; // how far to blend
   const offset = ((index / (total - 1)) - 0.5) * 2; // from -1 to 1
   const neighborTarget = offset < 0 ? neighborLeft : neighborRight;
-  const targetHue = (1 - Math.abs(offset)) * baseHue + Math.abs(offset) * neighborTarget;
+  const blendRatio = 0.3; // max 30% toward neighbor
+  const targetHue = (1 - Math.abs(offset) * blendRatio) * baseHue + (Math.abs(offset) * blendRatio) * neighborTarget;
   return (targetHue + 360) % 360;
 }
 
