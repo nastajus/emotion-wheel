@@ -93,7 +93,7 @@ function generateVisualNodes(emotionTree) {
   const visualNodes = [];
   const totalParents = emotionTree.length;
   const fullCircle = 2 * Math.PI;
-  let parentStartAngle = 0;
+  let parentStartAngle = rotationOffset;
 
   // Assign baseHues evenly spaced if not already defined
   const baseHueStep = 360 / totalParents;
@@ -187,12 +187,15 @@ function generateVisualNodes(emotionTree) {
   return visualNodes;
 }
 
-const visualNodes = generateVisualNodes(emotionTree);
-
 // === SVG Rendering ===
 const svg = document.getElementById("wheel");
 const centerX = 200;
 const centerY = 200;
+//const rotationOffset = -Math.PI / 2; // Rotate 90° counterclockwise, so the top is the new origin
+const rotationDegrees = 0; // Rotate so the top becomes the starting point
+const rotationOffset = degToRad(rotationDegrees);
+
+const visualNodes = generateVisualNodes(emotionTree);
 
 const ringWidths = {
   0: 60,  // inner radius
@@ -205,6 +208,10 @@ const ringStartRadius = {
   1: 110,
   2: 170
 };
+
+function degToRad(degrees) {
+  return (degrees * Math.PI) / 180;
+}
 
 function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color, label) {
   const endAngle = startAngle + sweep;
