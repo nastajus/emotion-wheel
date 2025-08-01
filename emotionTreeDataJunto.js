@@ -2,158 +2,168 @@
 
 export const literalEmotionTree = [
   {
-    name: "Joy",
-    baseHue: 60,
+    name: "Surprise",
     children: [
       {
-        name: "Optimistic",
-        children: [{ name: "Inspired" }, { name: "Hopeful" }]
+        name: "Stunned", 
+        children: [{ name: "Shocked" }, { name: "Dismayed" }]
       },
       {
-        name: "Trusting",
-        children: [{ name: "Supportive" }, { name: "Loving" }]
+        name: "Confused",
+        children: [{ name: "Disillusioned" }, { name: "Perplexed" }]
       },
       {
-        name: "Proud",
-        children: [{ name: "Triumphant" }, { name: "Confident" }]
+        name: "Amazed",
+        children: [{ name: "Astonished" }, { name: "Awe-struck" }]
       },
       {
-        name: "Cheerful",
-        children: [{ name: "Happy" }, { name: "Content" }]
+        name: "Overcome",
+        children: [{ name: "Speechless" }, { name: "Astounded" }]
       },
       {
-        name: "Excited",
-        children: [{ name: "Eager" }, { name: "Energetic" }]
-      },
-      {
-        name: "Grateful",
-        children: [{ name: "Appreciative" }, { name: "Thankful" }]
+        name: "Moved",
+        children: [{ name: "Simulated" }, { name: "Touched" }]
       }
     ]
   },
   {
-    name: "Trust",
-    baseHue: 120,
+    name: "Joy",
+    children: [
+      {
+        name: "Content",
+        children: [{ name: "Pleased" }, { name: "Satisfied" }]
+      },
+      {
+        name: "Happy",
+        children: [{ name: "Amused" }, { name: "Delighted" }]
+      },
+      {
+        name: "Cheerful",
+        children: [{ name: "Jovial" }, { name: "Blissful" }]
+      },
+      {
+        name: "Proud",
+        children: [{ name: "Triumphant" }, { name: "Illustrious" }]
+      },
+      {
+        name: "Optimistic",
+        children: [{ name: "Eager" }, { name: "Hopeful" }]
+      },
+      {
+        name: "Enthusiastic",
+        children: [{ name: "Excited" }, { name: "Zeal" }]
+      },
+      {
+        name: "Elation",
+        children: [{ name: "Euphoric" }, { name: "Jubilation" }]
+      },
+      {
+        name: "Enthralled",
+        children: [{ name: "Enchanted" }, { name: "Rapture" }]
+      }
+    ]
+  },
+  {
+    name: "Love",
     children: [
       {
         name: "Affectionate",
-        children: [{ name: "Warm" }, { name: "Caring" }]
+        children: [{ name: "Romantic" }, { name: "Fondness" }]
       },
       {
-        name: "Sensitive",
-        children: [{ name: "Tender" }, { name: "Loving" }]
+        name: "Longing",
+        children: [{ name: "Sentimental" }, { name: "Attracted" }]
       },
       {
-        name: "Intimate",
-        children: [{ name: "Connected" }, { name: "Compassionate" }]
+        name: "Desire",
+        children: [{ name: "Passion" }, { name: "Infatuation" }]
       },
       {
-        name: "Loyal",
-        children: [{ name: "Faithful" }, { name: "Reliable" }]
+        name: "Tenderness",
+        children: [{ name: "Caring" }, { name: "Compassionate" }]
       },
       {
-        name: "Approving",
-        children: [{ name: "Accepting" }, { name: "Friendly" }]
+        name: "Peaceful",
+        children: [{ name: "Relieved" }, { name: "Satisfied" }]
       }
     ]
   },
   {
     name: "Fear",
-    baseHue: 180,
     children: [
-      {
-        name: "Humiliated",
-        children: [{ name: "Disgraced" }, { name: "Shameful" }]
-      },
-      {
-        name: "Rejected",
-        children: [{ name: "Excluded" }, { name: "Persecuted" }]
-      },
-      {
-        name: "Insecure",
-        children: [{ name: "Inferior" }, { name: "Worthless" }]
-      },
-      {
-        name: "Anxious",
-        children: [{ name: "Worried" }, { name: "Overwhelmed" }]
-      },
       {
         name: "Scared",
         children: [{ name: "Frightened" }, { name: "Helpless" }]
-      }
-    ]
-  },
-  {
-    name: "Surprise",
-    baseHue: 240,
-    children: [
-      {
-        name: "Startled",
-        children: [{ name: "Shocked" }, { name: "Dismayed" }]
       },
       {
-        name: "Disillusioned",
-        children: [{ name: "Disappointed" }, { name: "Betrayed" }]
+        name: "Terror",
+        children: [{ name: "Panic" }, { name: "Hysterical" }]
+      },
+            {
+        name: "Insecure",
+        children: [{ name: "Inferior" }, { name: "Inadequate" }]
       },
       {
-        name: "Amazed",
-        children: [{ name: "Awe" }, { name: "Wonder" }]
+        name: "Nervous",
+        children: [{ name: "Worried" }, { name: "Anxious" }]
       },
       {
-        name: "Confused",
-        children: [{ name: "Perplexed" }, { name: "Disoriented" }]
-      }
-    ]
-  },
-  {
-    name: "Sadness",
-    baseHue: 300,
-    children: [
-      {
-        name: "Lonely",
-        children: [{ name: "Abandoned" }, { name: "Isolated" }]
-      },
-      {
-        name: "Vulnerable",
-        children: [{ name: "Fragile" }, { name: "Victimized" }]
-      },
-      {
-        name: "Despair",
-        children: [{ name: "Powerless" }, { name: "Hopeless" }]
-      },
-      {
-        name: "Guilty",
-        children: [{ name: "Remorseful" }, { name: "Ashamed" }]
-      },
-      {
-        name: "Depressed",
-        children: [{ name: "Empty" }, { name: "Inferior" }]
+        name: "Horror",
+        children: [{ name: "Mortified" }, { name: "Dread" }]
       }
     ]
   },
   {
     name: "Anger",
-    baseHue: 0,
     children: [
       {
-        name: "Hurt",
-        children: [{ name: "Embarrassed" }, { name: "Devastated" }]
+        name: "Rage",
+        children: [{ name: "Hate" }, { name: "Hostile" }]
       },
       {
-        name: "Hostile",
-        children: [{ name: "Jealous" }, { name: "Bitter" }]
+        name: "Exasperated",
+        children: [{ name: "Agitated" }, { name: "Frustrated" }]
       },
       {
-        name: "Angry",
-        children: [{ name: "Frustrated" }, { name: "Infuriated" }]
+        name: "Irritable",
+        children: [{ name: "Annoyed" }, { name: "Aggravated" }]
       },
       {
-        name: "Selfish",
-        children: [{ name: "Greedy" }, { name: "Arrogant" }]
+        name: "Envy",
+        children: [{ name: "Resentful" }, { name: "Jealous" }]
       },
       {
-        name: "Hateful",
-        children: [{ name: "Violent" }, { name: "Spiteful" }]
+        name: "Disgust",
+        children: [{ name: "Contempt" }, { name: "Revolted" }]
+      }
+    ]
+  },
+  {
+    name: "Sadness",
+    children: [
+      {
+        name: "Suffering",
+        children: [{ name: "Agony" }, { name: "Hurt" }]
+      },
+      {
+        name: "Sadness",
+        children: [{ name: "Depressed" }, { name: "Sorrow" }]
+      },
+      {
+        name: "Disappointed",
+        children: [{ name: "Dismayed" }, { name: "Displeased" }]
+      },
+      {
+        name: "Shameful",
+        children: [{ name: "Regretful" }, { name: "Guilty" }]
+      },
+      {
+        name: "Neglected",
+        children: [{ name: "Isoalted" }, { name: "Lonely" }]
+      },
+      {
+        name: "Despair",
+        children: [{ name: "Grief" }, { name: "Powerless" }]
       }
     ]
   }

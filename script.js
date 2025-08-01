@@ -191,7 +191,6 @@ function generateVisualNodes(emotionTree) {
 const svg = document.getElementById("wheel");
 const centerX = 200;
 const centerY = 200;
-//const rotationOffset = -Math.PI / 2; // Rotate 90° counterclockwise, so the top is the new origin
 const rotationDegrees = 0; // Rotate so the top becomes the starting point
 const rotationOffset = degToRad(rotationDegrees);
 
