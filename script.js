@@ -36,17 +36,32 @@ function pastelFromHue(hue) {
   return `hsl(${hue}, 60%, 85%)`; // pastel-ish tones
 }
 
-// Step 3: Calculate hue for middle/outer levels based on parent's hue and position
-function deriveHue(baseHue, index, total, neighborLeft, neighborRight) {
-  const blendRange = 20; // how far to blend
-  const offset = ((index / (total - 1)) - 0.5) * 2; // from -1 to 1
-  const neighborTarget = offset < 0 ? neighborLeft : neighborRight;
-  const blendRatio = 0.3; // max 30% toward neighbor
-  const targetHue = (1 - Math.abs(offset) * blendRatio) * baseHue + (Math.abs(offset) * blendRatio) * neighborTarget;
-  return (targetHue + 360) % 360;
+// Step 3: ~handle edge case for circular wrapping between 0° and 360°~
+function blendHueCircular(baseHue, targetHue, blendRatio) {
+  // Ensure both hues are in range [0, 360)
+  baseHue = ((baseHue % 360) + 360) % 360;
+  targetHue = ((targetHue % 360) + 360) % 360;
+
+  let diff = targetHue - baseHue;
+
+  // Adjust for shortest path around the circle
+  if (Math.abs(diff) > 180) {
+    diff -= Math.sign(diff) * 360;
+  }
+
+  const blendedHue = (baseHue + blendRatio * diff + 360) % 360;
+  return blendedHue;
 }
 
-// Step 4: Flatten the structure into visual wedges with position and color
+// Step 4: Calculate hue for middle/outer levels based on parent's hue and position
+function deriveHue(baseHue, index, total, neighborLeft, neighborRight) {
+  const offset = ((index / (total - 1)) - 0.5) * 2; // -1 to 1
+  const neighborTarget = offset < 0 ? neighborLeft : neighborRight;
+  const blendRatio = Math.abs(offset) * 0.3; // max 30% toward neighbor
+  return blendHueCircular(baseHue, neighborTarget, blendRatio);
+}
+
+// Step 5: Flatten the structure into visual wedges with position and color
 function generateVisualNodes(emotionTree) {
   const visualNodes = [];
   const totalParents = emotionTree.length;
