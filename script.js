@@ -1,6 +1,59 @@
 // === Emotion Wheel: Hierarchical Structure with Concentric Wedges ===
 
 // Step 1: Generate hierarchical data with 3 levels
+
+// === Option 1: Literal Emotion Tree (future multilingual support) ===
+const literalEmotionTree = [
+  {
+    name: "Joy",
+    baseHue: 60, // pastel yellow
+    translations: { fr: "Joie", es: "Alegría" },
+    children: [
+      {
+        name: "Peaceful",
+        children: [
+          { name: "Content" },
+          { name: "Serene" }
+        ]
+      },
+      {
+        name: "Excited",
+        children: [
+          { name: "Eager" },
+          { name: "Energetic" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "Trust",
+    baseHue: 120, // pastel green
+    children: [
+      {
+        name: "Affectionate",
+        children: [
+          { name: "Loving" },
+          { name: "Caring" }
+        ]
+      }
+    ]
+  },
+//   {
+//   name: "asdf",
+//   baseHue: 240,  //idk
+//   children: [
+//     {
+//       name: "asdasdf",
+//       children: [
+//         { name: "235434" },
+//         { name: "23423" }
+//       ]
+//     }
+//   ]
+//   }
+];
+
+// === Option 2: Generated Random Emotion Tree ===
 function generateEmotionTree() {
   const topLevelHueSteps = [60, 120, 180, 240, 300, 0]; // pastel yellow, green, cyan, blue, magenta, red
 
@@ -13,8 +66,8 @@ function generateEmotionTree() {
       middleNodes.push({
         name: childName,
         children: [
-          `${childName}_A`,
-          `${childName}_B`
+          { name: `${childName}_A` },
+          { name: `${childName}_B` }
         ]
       });
     }
@@ -29,11 +82,25 @@ function generateEmotionTree() {
   return tree;
 }
 
-const emotionTree = generateEmotionTree();
+// === Toggle between literal or generated data ===
+const useLiteral = true; // ⬅️ Change this to false to use generated
+const emotionTree = useLiteral ? literalEmotionTree : generateEmotionTree();
+
 
 // Step 2: Convert HSL hue to pastel color
-function pastelFromHue(hue) {
-  return `hsl(${hue}, 60%, 85%)`; // pastel-ish tones
+function pastelFromHue(hue, fadeLevel = 0) {
+  if (typeof hue !== 'number' || isNaN(hue)) return 'hsl(0, 0%, 80%)';
+
+  const maxFade = 2;
+  const fade = Math.min(fadeLevel, maxFade);
+
+  const baseLightness = 85;     // pastel baseline
+  const baseSaturation = 60;
+
+  const lightness = baseLightness - fade * 10;   // 85 → 75 → 65
+  const saturation = baseSaturation - fade * 5;  // 60 → 55 → 50
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 // Step 3: ~handle edge case for circular wrapping between 0° and 360°~
@@ -74,8 +141,8 @@ function generateVisualNodes(emotionTree) {
     const prevParent = emotionTree[(i - 1 + totalParents) % totalParents];
 
     const parentSweep = fullCircle / totalParents;
-    const parentHue = parent.baseHue;
-    const parentColor = pastelFromHue(parentHue);
+    const parentHue = parent.baseHue ?? 0;
+    const parentColor = pastelFromHue(parentHue, 0);
 
     visualNodes.push({
       label: parent.name,
@@ -90,30 +157,46 @@ function generateVisualNodes(emotionTree) {
 
     for (let j = 0; j < middle.length; j++) {
       const middleSweep = parentSweep / middle.length;
-      const midHue = deriveHue(parentHue, j, middle.length, prevParent.baseHue, nextParent.baseHue);
-      const midColor = pastelFromHue(midHue);
+
+      const neighborLeftHue = prevParent?.baseHue ?? parentHue;
+      const neighborRightHue = nextParent?.baseHue ?? parentHue;
+      const midHue = deriveHue(parentHue, j, middle.length, neighborLeftHue, neighborRightHue);
+      const midColor = pastelFromHue(midHue, 1);
+
+      middle[j].hue = midHue;
 
       visualNodes.push({
         label: middle[j].name,
         depth: 1,
         angle: middleStartAngle,
         sweep: middleSweep,
-        color: midColor
+        color: midColor,
+        hue: midHue // store hue for children to inherit
       });
 
       const outer = middle[j].children;
       const outerSweep = middleSweep / outer.length;
       let outerStartAngle = middleStartAngle;
 
+      const lastMiddleNode = visualNodes[visualNodes.length - 1];
+      const effectiveHue = lastMiddleNode.hue ?? parentHue ?? 0;
+
       for (let k = 0; k < outer.length; k++) {
+        const childObj = typeof outer[k] === 'string' ? { name: outer[k] } : outer[k];
+        const effectiveHue = middle[j].hue ?? parentHue ?? 0;
+        const outerHue = childObj.baseHue ?? midHue ?? parentHue ?? 0;
+        const outerColor = pastelFromHue(outerHue, 2);
+
         visualNodes.push({
-          label: outer[k],
+          label: childObj.name,
           depth: 2,
           angle: outerStartAngle,
           sweep: outerSweep,
-          color: pastelFromHue(midHue)
+          color: outerColor
         });
+
         outerStartAngle += outerSweep;
+        console.log("Label:", childObj.name, "Hue:", outerHue, "Color:", pastelFromHue(outerHue, 2));
       }
 
       middleStartAngle += middleSweep;
