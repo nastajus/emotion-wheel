@@ -269,6 +269,26 @@ function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color
 
   text.setAttribute("transform", `rotate(${rotation}, ${lx}, ${ly})`);
   svg.appendChild(text);
+
+  // ✅ Add zoom listener *after* SVG is added
+  setupZoomListener(svg);
+
+}
+
+function setupZoomListener(svg) {
+  let zoomLevel = 1;
+  const minZoom = 0.2;
+  const maxZoom = 5;
+  const zoomFactor = 0.1;
+
+  svg.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const direction = e.deltaY > 0 ? -1 : 1;
+    const newZoom = zoomLevel + direction * zoomFactor;
+
+    zoomLevel = Math.min(Math.max(newZoom, minZoom), maxZoom);
+    svg.style.transform = `scale(${zoomLevel})`;
+  });
 }
 
 for (const node of visualNodes) {
