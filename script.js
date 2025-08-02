@@ -215,10 +215,13 @@ function degToRad(degrees) {
 function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color, label) {
   const endAngle = startAngle + sweep;
 
+  // Coordinates for the inner arc
   const x0 = centerX + innerR * Math.cos(startAngle);
   const y0 = centerY + innerR * Math.sin(startAngle);
   const x1 = centerX + innerR * Math.cos(endAngle);
   const y1 = centerY + innerR * Math.sin(endAngle);
+
+  // Coordinates for the outer arc
   const x2 = centerX + outerR * Math.cos(endAngle);
   const y2 = centerY + outerR * Math.sin(endAngle);
   const x3 = centerX + outerR * Math.cos(startAngle);
@@ -234,11 +237,13 @@ function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color
     "Z"
   ].join(" ");
 
+  // Create and style the wedge
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d);
   path.setAttribute("fill", color);
   svg.appendChild(path);
 
+  // === LABEL PLACEMENT ===
   const midAngle = startAngle + sweep / 2;
   const labelRadius = (innerR + outerR) / 2;
   const lx = centerX + labelRadius * Math.cos(midAngle);
@@ -252,7 +257,12 @@ function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color
   text.setAttribute("text-anchor", "middle");
   text.setAttribute("dominant-baseline", "middle");
 
-  let rotation = (midAngle * 180) / Math.PI;
+  // === TEXT ROTATION LOGIC ===
+  // use central vertical dividing line as text flipping threshold
+  let angleDeg = (midAngle * 180) / Math.PI;
+  angleDeg = (angleDeg + 360) % 360;
+
+  let rotation = angleDeg;
   if (rotation > 90 && rotation < 270) {
     rotation += 180;
   }
