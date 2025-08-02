@@ -320,3 +320,16 @@ function hidePopup() {
 
 // Close when clicking the ✖
 document.getElementById("popup-close").addEventListener("click", hidePopup);
+
+
+// dynamically resize viewbox to fit full wheel
+const lastRadius = ringStartRadius[Math.max(...Object.keys(ringStartRadius))];
+const lastWidth = ringWidths[Math.max(...Object.keys(ringWidths))];
+const outerR = lastRadius + lastWidth;
+
+const padding = 20;
+const viewBoxMinX = centerX - outerR - padding;
+const viewBoxMinY = centerY - outerR - padding;
+const viewBoxSize = outerR * 2 + padding * 2;
+
+svg.setAttribute("viewBox", `${viewBoxMinX} ${viewBoxMinY} ${viewBoxSize} ${viewBoxSize}`);
