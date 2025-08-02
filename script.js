@@ -273,6 +273,12 @@ function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color
   // ✅ Add zoom listener *after* SVG is added
   setupZoomListener(svg);
 
+  // 🎉 Add pop-up listener
+  text.addEventListener("click", () => {
+    const color = text.getAttribute("fill");
+    const label = text.textContent;
+    showPopup(label, color);
+  });
 }
 
 function setupZoomListener(svg) {
@@ -296,3 +302,21 @@ for (const node of visualNodes) {
   const outerR = innerR + ringWidths[node.depth];
   drawArcWedge(centerX, centerY, innerR, outerR, node.angle, node.sweep, node.color, node.label);
 }
+
+
+
+function showPopup(label, color) {
+  const popup = document.getElementById("popup");
+  const popupLabel = document.getElementById("popup-label");
+
+  popupLabel.textContent = label;
+  popup.style.borderColor = color;
+  popup.style.display = "block";
+}
+
+function hidePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+
+// Close when clicking the ✖
+document.getElementById("popup-close").addEventListener("click", hidePopup);
