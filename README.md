@@ -31,6 +31,7 @@ This project should therefore be understood as an interface and data-visualizati
 - Supports mouse-wheel zooming.
 - Opens a small label popup when an emotion is clicked.
 - Switches instantly between English, Spanish, French, German, Lithuanian, Japanese, Simplified Chinese, Russian, Persian, and Vietnamese.
+- Cycles languages by scrolling over the selector without clicking, with continuous first-to-last looping.
 - Keeps the canonical English term visible in translated popups and supports shareable `?lang=` URLs.
 - Fits translated labels to their wedges and handles Persian right-to-left text.
 - Can switch between the Junto-derived data and a smaller test tree in the source.

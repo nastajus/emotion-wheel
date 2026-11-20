@@ -75,9 +75,16 @@ h1 {
 }
 
 #translation-route {
-  margin: -4px 0 8px;
+  margin: -4px 0 0;
   color: #aeb5ad;
   font-size: 0.78rem;
+}
+
+#language-hint {
+  margin: -8px 0 8px;
+  color: #80877f;
+  font-size: 0.7rem;
+  line-height: 1.4;
 }
 
 .translation-note {

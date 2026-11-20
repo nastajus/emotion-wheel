@@ -405,6 +405,34 @@ languageSelect.addEventListener("change", () => {
   sidebarToggle.setAttribute("aria-expanded", "false");
 });
 
+function cycleLanguage(direction) {
+  const currentIndex = Math.max(
+    0,
+    languages.findIndex(({ code }) => code === languageSelect.value)
+  );
+  const nextIndex = (currentIndex + direction + languages.length) % languages.length;
+  languageSelect.value = languages[nextIndex].code;
+  setLanguage(languageSelect.value);
+}
+
+let lastLanguageWheelStep = 0;
+languageSelect.addEventListener("wheel", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const now = performance.now();
+  if (event.deltaY === 0 || now - lastLanguageWheelStep < 140) return;
+
+  lastLanguageWheelStep = now;
+  cycleLanguage(event.deltaY > 0 ? 1 : -1);
+}, { passive: false });
+
+languageSelect.addEventListener("keydown", (event) => {
+  if (event.altKey || !["ArrowUp", "ArrowDown"].includes(event.key)) return;
+  event.preventDefault();
+  cycleLanguage(event.key === "ArrowDown" ? 1 : -1);
+});
+
 sidebarToggle.addEventListener("click", () => {
   const isOpen = sidebar.classList.toggle("is-open");
   sidebarToggle.textContent = isOpen ? "Close" : "Languages";
