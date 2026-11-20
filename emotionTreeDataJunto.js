@@ -22,7 +22,7 @@ export const literalEmotionTree = [
       },
       {
         name: "Moved",
-        children: [{ name: "Simulated" }, { name: "Touched" }]
+        children: [{ name: "Stimulated" }, { name: "Touched" }]
       }
     ]
   },
@@ -159,7 +159,7 @@ export const literalEmotionTree = [
       },
       {
         name: "Neglected",
-        children: [{ name: "Isoalted" }, { name: "Lonely" }]
+        children: [{ name: "Isolated" }, { name: "Lonely" }]
       },
       {
         name: "Despair",

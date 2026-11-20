@@ -30,6 +30,9 @@ This project should therefore be understood as an interface and data-visualizati
 - Sizes the SVG view box from the wheel dimensions so the full wheel remains visible.
 - Supports mouse-wheel zooming.
 - Opens a small label popup when an emotion is clicked.
+- Switches instantly between English, Spanish, French, German, Lithuanian, Japanese, Simplified Chinese, Russian, Persian, and Vietnamese.
+- Keeps the canonical English term visible in translated popups and supports shareable `?lang=` URLs.
+- Fits translated labels to their wedges and handles Persian right-to-left text.
 - Can switch between the Junto-derived data and a smaller test tree in the source.
 
 ## Running locally
@@ -62,7 +65,7 @@ Serving the files is preferable to opening `index.html` directly because the emo
 
 ## Data and customization
 
-The active hierarchy is defined in [`emotionTreeDataJunto.js`](emotionTreeDataJunto.js). Each node has a `name` and may contain `children`:
+The active hierarchy is defined in [`emotionTreeDataJunto.js`](emotionTreeDataJunto.js). Each node has a canonical English `name` and may contain `children`:
 
 ```js
 {
@@ -84,14 +87,16 @@ If a top-level `baseHue` is not supplied, the renderer assigns one by distributi
 
 The renderer was designed with interchangeable trees in mind, but it is not yet a general-purpose hierarchy visualizer. The active version assumes exactly three displayed levels and gives siblings equal angular width. A separate refactor branch explores recursive layout and configuration, but remains unfinished.
 
+Translations are bundled in [`translations.js`](translations.js), so switching languages works offline after the page has loaded. They were developed from machine-assisted drafts with context-specific corrections for ambiguous emotion words. They have not been professionally reviewed in every language; corrections and culturally better equivalents are welcome.
+
 ## Scope and possible directions
 
 The concentric pie model works naturally for Junto- and Willcox-like taxonomies. Plutchik's model is structurally different: its petal geometry, opposing emotions, intensity axis, dyads, and optional three-dimensional cone carry meaning that would be lost if they were forced into ordinary nested rings. Supporting it properly would require a second layout model rather than another data file. After exploring that representation, I chose to keep the prototype focused instead of implementing a complex model I did not yet understand well enough to represent faithfully.
 
 Other directions considered during development include:
 
-- **Definitions and word exploration.** The click popup currently repeats the selected label. Connecting labels to definitions, usage notes, or related terms remains an idea rather than implemented functionality.
-- **Multilingual vocabularies.** A test data file contains the beginning of a translation structure, but the UI does not yet select or display languages.
+- **Definitions and word exploration.** The click popup shows the selected translation and its canonical English label. Connecting labels to definitions, usage notes, or related terms remains an idea rather than implemented functionality.
+- **Deeper localization.** Emotion labels are translated, while the surrounding interface and explanatory text remain in English for now.
 - **Translation fidelity.** Emotion vocabularies do not map one-to-one across languages. Multiple English terms may collapse into one translated word, one term may require a phrase, or a target language may divide the concept differently. Treating those mismatches as data rather than hiding them would make this an interesting language and interface project.
 - **Additional wheel families.** A pluggable renderer could select a concentric hierarchy, a Plutchik-style radial model, or another layout according to the semantics of the source system.
 

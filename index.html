@@ -3,16 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <title>Emotion Wheel</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="emotion-container">
+  <aside id="language-sidebar" aria-label="Language settings">
+    <div class="sidebar-heading">
+      <p class="eyebrow">Emotion wheel</p>
+      <h1>Find the right word</h1>
+    </div>
+
+    <label for="language-select">Language</label>
+    <select id="language-select"></select>
+    <p id="translation-route">English → English</p>
+
+    <div class="translation-note">
+      <h2>About translation</h2>
+      <p>English is the reference vocabulary. Emotion words do not always map one-to-one across languages, so some labels are close interpretations rather than exact equivalents.</p>
+    </div>
+
+    <p class="source-note">
+      Vocabulary based primarily on the
+      <a href="https://www.thejuntoinstitute.com/2024/08/28/emotion-wheels/" target="_blank" rel="noreferrer">Junto Emotion Wheel</a>.
+    </p>
+  </aside>
+
+  <button id="sidebar-toggle" type="button" aria-controls="language-sidebar" aria-expanded="false">
+    Languages
+  </button>
+
+  <main id="emotion-container">
     <!-- fallback dimensions if javascript fails -->
-    <svg id="wheel" class="wheel" viewBox="-60 -60 520 520" preserveAspectRatio="xMidYMid meet"></svg>
-  </div>
-  <div id="popup" style="display: none;">
-    <span id="popup-close">✖</span>
+    <svg id="wheel" class="wheel" viewBox="-60 -60 520 520" preserveAspectRatio="xMidYMid meet" aria-label="Interactive emotion wheel"></svg>
+  </main>
+
+  <div id="popup" role="dialog" aria-live="polite" aria-label="Selected emotion" hidden>
+    <button id="popup-close" type="button" aria-label="Close">×</button>
     <div id="popup-label"></div>
+    <div id="popup-english"></div>
   </div>
   <script type="module" src="script.js"></script>
 </body>
