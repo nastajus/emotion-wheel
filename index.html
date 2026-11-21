@@ -28,19 +28,26 @@
       </div>
       <p id="translation-route" aria-live="polite">English → English</p>
 
-      <section class="navigation-legend" aria-labelledby="navigation-heading">
-        <div class="legend-heading">
-          <h2 id="navigation-heading">Navigation</h2>
-          <button id="help-open" type="button" aria-haspopup="dialog">All controls</button>
+      <section id="navigation-legend" class="navigation-legend" aria-labelledby="navigation-toggle">
+        <button id="navigation-toggle" class="navigation-toggle" type="button" aria-controls="navigation-panel" aria-expanded="false">
+          <span>Navigation</span><span class="navigation-chevron" aria-hidden="true">⌃</span>
+        </button>
+        <div id="navigation-panel" class="navigation-panel">
+          <div class="navigation-panel-inner">
+            <div class="legend-heading">
+              <span>Shortcuts</span>
+              <button id="help-open" type="button" aria-haspopup="dialog">All controls</button>
+            </div>
+            <dl>
+              <div><dt>Pan</dt><dd><kbd>Drag</kbd></dd></div>
+              <div><dt>Zoom</dt><dd><kbd>Scroll</kbd></dd></div>
+              <div><dt>Next word</dt><dd><kbd>Shift</kbd><span>+</span><kbd>Scroll</kbd></dd></div>
+              <div id="language-cycle-note"><dt>Languages</dt><dd><kbd>Hover</kbd><span>+</span><kbd>Scroll</kbd></dd></div>
+              <div id="language-cycle-set"><dt>Cycle set</dt><dd>Checked options</dd></div>
+              <div><dt>Sidebar</dt><dd><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Alt</kbd><span>+</span><kbd>S</kbd></dd></div>
+            </dl>
+          </div>
         </div>
-        <dl>
-          <div><dt>Pan</dt><dd><kbd>Drag</kbd></dd></div>
-          <div><dt>Zoom</dt><dd><kbd>Scroll</kbd></dd></div>
-          <div><dt>Next word</dt><dd><kbd>Shift</kbd><span>+</span><kbd>Scroll</kbd></dd></div>
-          <div id="language-cycle-note"><dt>Languages</dt><dd><kbd>Hover</kbd><span>+</span><kbd>Scroll</kbd></dd></div>
-          <div id="language-cycle-set"><dt>Cycle set</dt><dd>Checked options</dd></div>
-          <div><dt>Sidebar</dt><dd><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Alt</kbd><span>+</span><kbd>S</kbd></dd></div>
-        </dl>
       </section>
 
       <button id="about-open" class="sidebar-navigation" type="button" aria-controls="sidebar-about">

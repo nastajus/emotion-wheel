@@ -63,7 +63,6 @@ h1 {
 }
 
 .control-label,
-.navigation-legend h2,
 .about-content h2 {
   margin: 0;
   font-size: 0.78rem;
@@ -177,6 +176,7 @@ h1 {
 #help-close:focus-visible,
 #about-open:focus-visible,
 #about-back:focus-visible,
+#navigation-toggle:focus-visible,
 .language-actions button:focus-visible,
 .language-name:focus-visible,
 .definition-toggle:focus-visible {
@@ -253,8 +253,48 @@ h1 {
 
 .navigation-legend {
   margin-top: auto;
-  padding-top: 18px;
   border-top: 1px solid #353832;
+}
+
+.navigation-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #d9ddd8;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.navigation-chevron {
+  color: #b6ddcd;
+  font-size: 1rem;
+  transition: transform 0.18s ease;
+}
+
+.navigation-legend.is-open .navigation-chevron { transform: rotate(180deg); }
+
+.navigation-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.18s ease, opacity 0.14s ease;
+}
+
+.navigation-legend.is-open .navigation-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.navigation-panel-inner {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .legend-heading {
@@ -262,6 +302,11 @@ h1 {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
+  padding-top: 6px;
+  color: #858b84;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 #help-open {
@@ -276,31 +321,33 @@ h1 {
   cursor: pointer;
 }
 
-.navigation-legend dl {
+.navigation-panel dl {
   display: grid;
   gap: 7px;
   margin: 12px 0 0;
 }
 
-.navigation-legend dl > div {
+.navigation-panel dl > div {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.navigation-legend dt,
-.navigation-legend dd {
+.navigation-panel dt,
+.navigation-panel dd {
   margin: 0;
   font-size: 0.7rem;
 }
 
-.navigation-legend dd {
+.navigation-panel dd {
   display: flex;
   align-items: center;
   gap: 3px;
   color: #d8dcd6;
 }
+
+.navigation-panel dl { padding-bottom: 12px; }
 
 kbd {
   display: inline-flex;

@@ -203,6 +203,8 @@ const sidebarToggle = document.getElementById("sidebar-toggle");
 const helpDialog = document.getElementById("help-dialog");
 const sidebarMain = document.getElementById("sidebar-main");
 const sidebarAbout = document.getElementById("sidebar-about");
+const navigationLegend = document.getElementById("navigation-legend");
+const navigationToggle = document.getElementById("navigation-toggle");
 let selectedLanguage = "en";
 let enabledLanguages = new Set(languages.map(({ code }) => code));
 const centerX = 200;
@@ -834,6 +836,56 @@ function showSidebarMain() {
 
 document.getElementById("about-open").addEventListener("click", showSidebarAbout);
 document.getElementById("about-back").addEventListener("click", showSidebarMain);
+
+let navigationPinned = false;
+let navigationHovered = false;
+let navigationFocused = false;
+let navigationPreviewSuppressed = false;
+
+function updateNavigationPanel() {
+  const previewOpen = !navigationPreviewSuppressed && (navigationHovered || navigationFocused);
+  const open = navigationPinned || previewOpen;
+  navigationLegend.classList.toggle("is-open", open);
+  navigationToggle.setAttribute("aria-expanded", String(open));
+}
+
+navigationLegend.addEventListener("mouseenter", () => {
+  navigationHovered = true;
+  if (!navigationFocused) navigationPreviewSuppressed = false;
+  updateNavigationPanel();
+});
+
+navigationLegend.addEventListener("mouseleave", () => {
+  navigationHovered = false;
+  if (!navigationFocused) navigationPreviewSuppressed = false;
+  updateNavigationPanel();
+});
+
+navigationLegend.addEventListener("focusin", () => {
+  navigationFocused = true;
+  navigationPreviewSuppressed = false;
+  updateNavigationPanel();
+});
+
+navigationLegend.addEventListener("focusout", () => {
+  requestAnimationFrame(() => {
+    navigationFocused = navigationLegend.contains(document.activeElement);
+    if (!navigationHovered && !navigationFocused) navigationPreviewSuppressed = false;
+    updateNavigationPanel();
+  });
+});
+
+navigationToggle.addEventListener("click", (event) => {
+  if (navigationPinned) {
+    navigationPinned = false;
+    navigationPreviewSuppressed = true;
+    if (event.detail !== 0) navigationToggle.blur();
+  } else {
+    navigationPinned = true;
+    navigationPreviewSuppressed = false;
+  }
+  updateNavigationPanel();
+});
 
 document.getElementById("help-open").addEventListener("click", () => helpDialog.showModal());
 document.getElementById("help-close").addEventListener("click", () => helpDialog.close());
