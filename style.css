@@ -254,6 +254,14 @@ h1 {
 .navigation-legend {
   margin-top: auto;
   border-top: 1px solid #353832;
+  border-radius: 5px 5px 0 0;
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.navigation-legend.is-pinned {
+  border-color: #577668;
+  background: #203029;
+  box-shadow: inset 3px 0 #8ecab3;
 }
 
 .navigation-toggle {
@@ -271,6 +279,19 @@ h1 {
   font-weight: 700;
   cursor: pointer;
 }
+
+.navigation-toggle-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8f9690;
+  font-size: 0.62rem;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.navigation-legend.is-open:not(.is-pinned) .navigation-toggle-meta { color: #b6ddcd; }
+.navigation-legend.is-pinned .navigation-toggle-meta { color: #bde8d6; }
 
 .navigation-chevron {
   color: #b6ddcd;
@@ -295,6 +316,8 @@ h1 {
 .navigation-panel-inner {
   min-height: 0;
   overflow: hidden;
+  padding: 0 8px;
+  cursor: pointer;
 }
 
 .legend-heading {

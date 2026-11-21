@@ -29,8 +29,12 @@
       <p id="translation-route" aria-live="polite">English → English</p>
 
       <section id="navigation-legend" class="navigation-legend" aria-labelledby="navigation-toggle">
-        <button id="navigation-toggle" class="navigation-toggle" type="button" aria-controls="navigation-panel" aria-expanded="false">
-          <span>Navigation</span><span class="navigation-chevron" aria-hidden="true">⌃</span>
+        <button id="navigation-toggle" class="navigation-toggle" type="button" aria-controls="navigation-panel" aria-expanded="false" aria-pressed="false">
+          <span>Navigation</span>
+          <span class="navigation-toggle-meta">
+            <span id="navigation-state">Hover</span>
+            <span class="navigation-chevron" aria-hidden="true">⌃</span>
+          </span>
         </button>
         <div id="navigation-panel" class="navigation-panel">
           <div class="navigation-panel-inner">

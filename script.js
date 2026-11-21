@@ -205,6 +205,7 @@ const sidebarMain = document.getElementById("sidebar-main");
 const sidebarAbout = document.getElementById("sidebar-about");
 const navigationLegend = document.getElementById("navigation-legend");
 const navigationToggle = document.getElementById("navigation-toggle");
+const navigationState = document.getElementById("navigation-state");
 let selectedLanguage = "en";
 let enabledLanguages = new Set(languages.map(({ code }) => code));
 const centerX = 200;
@@ -846,7 +847,10 @@ function updateNavigationPanel() {
   const previewOpen = !navigationPreviewSuppressed && (navigationHovered || navigationFocused);
   const open = navigationPinned || previewOpen;
   navigationLegend.classList.toggle("is-open", open);
+  navigationLegend.classList.toggle("is-pinned", navigationPinned);
   navigationToggle.setAttribute("aria-expanded", String(open));
+  navigationToggle.setAttribute("aria-pressed", String(navigationPinned));
+  navigationState.textContent = navigationPinned ? "Pinned" : open ? "Click to pin" : "Hover";
 }
 
 navigationLegend.addEventListener("mouseenter", () => {
@@ -875,11 +879,15 @@ navigationLegend.addEventListener("focusout", () => {
   });
 });
 
-navigationToggle.addEventListener("click", (event) => {
+navigationLegend.addEventListener("click", (event) => {
+  if (event.target.closest("#help-open")) return;
+
   if (navigationPinned) {
     navigationPinned = false;
     navigationPreviewSuppressed = true;
-    if (event.detail !== 0) navigationToggle.blur();
+    if (event.detail !== 0 && event.target.closest("#navigation-toggle")) {
+      navigationToggle.blur();
+    }
   } else {
     navigationPinned = true;
     navigationPreviewSuppressed = false;
