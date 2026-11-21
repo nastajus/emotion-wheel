@@ -2,6 +2,8 @@
 
 A small, dependency-free SVG emotion wheel built with vanilla HTML, CSS, and JavaScript.
 
+**[Open the live wheel](https://nastajus.github.io/emotional-wheel/)**
+
 ![The rendered emotional wheel](docs/emotion-wheel.png)
 
 This project began as an exploration of how emotion vocabularies can be represented as interchangeable, hierarchical data rather than as a single fixed graphic. The current dataset and visual structure are based primarily on the [Junto Emotion Wheel](https://www.thejuntoinstitute.com/2024/08/28/emotion-wheels/): six broad emotion families lead to related terms and then to more precise words.
@@ -28,12 +30,18 @@ This project should therefore be understood as an interface and data-visualizati
 - Darkens and desaturates colors toward the outer rings.
 - Rotates labels around the wheel while keeping text upright on the left side.
 - Sizes the SVG view box from the wheel dimensions so the full wheel remains visible.
-- Supports mouse-wheel zooming.
-- Opens a small label popup when an emotion is clicked.
+- Supports cursor-centered mouse-wheel zoom and click-drag or touch panning across the wheel's full bounds.
+- Recalculates navigation bounds from the available viewport, keeping the wheel reachable when the surrounding layout changes size.
+- Distinguishes a stationary click from a drag: click a word to select it and open its popup; drag to pan.
+- Highlights the selected wedge and cycles through adjacent words on the same ring when scrolling over the popup.
+- Expands the popup on demand with English or selected-language definitions.
 - Switches instantly between English, Spanish, French, German, Lithuanian, Japanese, Simplified Chinese, Russian, Persian, and Vietnamese.
 - Cycles languages by scrolling over the selector without clicking, with continuous first-to-last looping.
+- Filters the scrolling language set with per-language checkmarks plus Check all and Check none controls.
 - Keeps the canonical English term visible in translated popups and supports shareable `?lang=` URLs.
 - Fits translated labels to their wedges and handles Persian right-to-left text.
+- Collapses the language sidebar from its always-visible edge handle.
+- Prints the wheel by itself on one landscape Letter page.
 - Can switch between the Junto-derived data and a smaller test tree in the source.
 
 ## Running locally
@@ -96,7 +104,7 @@ The concentric pie model works naturally for Junto- and Willcox-like taxonomies.
 
 Other directions considered during development include:
 
-- **Definitions and word exploration.** The click popup shows the selected translation and its canonical English label. Connecting labels to definitions, usage notes, or related terms remains an idea rather than implemented functionality.
+- **Definitions and word exploration.** The expandable popup loads concise English definitions from the Free Dictionary API and can machine-translate them into the selected language. A basic offline description remains available when the service cannot define a word. Richer usage notes and hand-reviewed definitions remain possible future work.
 - **Deeper localization.** Emotion labels are translated, while the surrounding interface and explanatory text remain in English for now.
 - **Translation fidelity.** Emotion vocabularies do not map one-to-one across languages. Multiple English terms may collapse into one translated word, one term may require a phrase, or a target language may divide the concept differently. Treating those mismatches as data rather than hiding them would make this an interesting language and interface project.
 - **Additional wheel families.** A pluggable renderer could select a concentric hierarchy, a Plutchik-style radial model, or another layout according to the semantics of the source system.
@@ -116,6 +124,7 @@ The three main references should not be ranked on a single informal "scientific"
 - [The Feeling Wheel: A Tool for Expanding Awareness of Emotions and Increasing Spontaneity and Intimacy](https://thefeelingswheel.com/wp-content/uploads/2024/09/willcox1982_feelingswheel.pdf), Gloria Willcox, *Transactional Analysis Journal*, 1982.
 - [PyPlutchik: Visualising and comparing emotion-annotated corpora](https://doi.org/10.1371/journal.pone.0256503), Semeraro et al., *PLOS ONE*, 2021.
 - [Issues in the translation equivalence of basic emotion terms](https://doi.org/10.1016/j.amper.2023.100128), Wierzba et al., *Ampersand*, 2023.
+- [Free Dictionary API](https://dictionaryapi.dev/), on-demand English definitions used by the expanded popup.
 
 ## Project status
 

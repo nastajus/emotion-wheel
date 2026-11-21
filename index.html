@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Emotion Wheel</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
@@ -13,8 +14,17 @@
       <h1>Find the right word</h1>
     </div>
 
-    <label for="language-select">Language</label>
-    <select id="language-select" aria-describedby="language-hint"></select>
+    <span class="control-label">Language</span>
+    <div id="language-picker">
+      <button id="language-current" type="button" aria-haspopup="listbox" aria-expanded="false" aria-describedby="language-hint"></button>
+      <div id="language-menu" hidden>
+        <div class="language-actions">
+          <button id="languages-all" type="button">Check all</button>
+          <button id="languages-none" type="button">Check none</button>
+        </div>
+        <ul id="language-options" role="listbox" aria-label="Languages"></ul>
+      </div>
+    </div>
     <p id="translation-route" aria-live="polite">English → English</p>
     <p id="language-hint">Hover and scroll to cycle. The list loops.</p>
 
@@ -29,19 +39,31 @@
     </p>
   </aside>
 
-  <button id="sidebar-toggle" type="button" aria-controls="language-sidebar" aria-expanded="false">
-    Languages
+  <button id="sidebar-toggle" type="button" aria-controls="language-sidebar" aria-expanded="true" aria-label="Collapse language sidebar">
+    ‹
   </button>
 
   <main id="emotion-container">
-    <!-- fallback dimensions if javascript fails -->
-    <svg id="wheel" class="wheel" viewBox="-60 -60 520 520" preserveAspectRatio="xMidYMid meet" aria-label="Interactive emotion wheel"></svg>
+    <div id="wheel-stage">
+      <!-- fallback dimensions if javascript fails -->
+      <svg id="wheel" class="wheel" viewBox="-60 -60 520 520" preserveAspectRatio="xMidYMid meet" aria-label="Interactive emotion wheel"></svg>
+    </div>
   </main>
 
   <div id="popup" role="dialog" aria-live="polite" aria-label="Selected emotion" hidden>
     <button id="popup-close" type="button" aria-label="Close">×</button>
     <div id="popup-label"></div>
     <div id="popup-english"></div>
+    <p id="popup-scroll-hint">Scroll here to explore this ring</p>
+    <button id="popup-expand" type="button" aria-expanded="false">More details</button>
+    <div id="popup-details" hidden>
+      <div class="definition-tabs" role="group" aria-label="Definition language">
+        <button id="definition-english" type="button" class="is-active">English</button>
+        <button id="definition-translated" type="button">Selected language</button>
+      </div>
+      <p id="popup-definition">Choose a definition language.</p>
+      <p class="definition-source">Definitions load on demand from Free Dictionary API. Translations are machine-assisted.</p>
+    </div>
   </div>
   <script type="module" src="script.js"></script>
 </body>

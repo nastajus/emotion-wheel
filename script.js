@@ -190,17 +190,24 @@ function generateVisualNodes(emotionTree) {
 
 // === SVG Rendering ===
 const svg = document.getElementById("wheel");
-const languageSelect = document.getElementById("language-select");
+const emotionContainer = document.getElementById("emotion-container");
+const wheelStage = document.getElementById("wheel-stage");
+const languageCurrent = document.getElementById("language-current");
+const languageMenu = document.getElementById("language-menu");
+const languageOptions = document.getElementById("language-options");
+const languagesAll = document.getElementById("languages-all");
+const languagesNone = document.getElementById("languages-none");
 const translationRoute = document.getElementById("translation-route");
-const sidebar = document.getElementById("language-sidebar");
 const sidebarToggle = document.getElementById("sidebar-toggle");
 let selectedLanguage = "en";
+let enabledLanguages = new Set(languages.map(({ code }) => code));
 const centerX = 200;
 const centerY = 200;
 const rotationDegrees = 0; // Rotate so the top becomes the starting point
 const rotationOffset = degToRad(rotationDegrees);
 
 const visualNodes = generateVisualNodes(emotionTree);
+visualNodes.forEach((node, index) => { node.id = String(index); });
 
 const ringWidths = {
   0: 60,  // inner radius
@@ -218,7 +225,7 @@ function degToRad(degrees) {
   return (degrees * Math.PI) / 180;
 }
 
-function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color, label) {
+function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color, label, nodeId, depth) {
   const endAngle = startAngle + sweep;
 
   // Coordinates for the inner arc
@@ -248,7 +255,9 @@ function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color
   path.setAttribute("d", d);
   path.setAttribute("fill", color);
   path.dataset.englishLabel = label;
-  path.addEventListener("click", () => showPopup(label, color));
+  path.dataset.nodeId = nodeId;
+  path.dataset.depth = depth;
+  path.addEventListener("click", () => showPopup(label, color, nodeId));
   svg.appendChild(path);
 
   // === LABEL PLACEMENT ===
@@ -262,6 +271,8 @@ function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color
   text.setAttribute("y", ly);
   text.textContent = translateEmotion(label, selectedLanguage);
   text.dataset.englishLabel = label;
+  text.dataset.nodeId = nodeId;
+  text.dataset.depth = depth;
   text.setAttribute("text-anchor", "middle");
   text.setAttribute("dominant-baseline", "middle");
 
@@ -280,7 +291,7 @@ function drawArcWedge(centerX, centerY, innerR, outerR, startAngle, sweep, color
   fitLabel(text, outerR - innerR - 7);
 
   text.addEventListener("click", () => {
-    showPopup(label, color);
+    showPopup(label, color, nodeId);
   });
 }
 
@@ -294,58 +305,352 @@ function fitLabel(text, availableWidth) {
   }
 }
 
-function setupZoomListener(svg) {
+function setupWheelNavigation(viewport, stage, wheel) {
   let zoomLevel = 1;
-  const minZoom = 0.2;
+  let initialized = false;
+  let resizeFrame = null;
+  let dragState = null;
+  let suppressNextClick = false;
+  let metrics = null;
+  let centerWheelPoint = { x: 0.5, y: 0.5 };
+  const minZoom = 0.35;
   const maxZoom = 5;
-  const zoomFactor = 0.1;
 
-  svg.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    const direction = e.deltaY > 0 ? -1 : 1;
-    const newZoom = zoomLevel + direction * zoomFactor;
+  function captureAnchor(clientX, clientY) {
+    const viewportRect = viewport.getBoundingClientRect();
+    const wheelRect = wheel.getBoundingClientRect();
 
-    zoomLevel = Math.min(Math.max(newZoom, minZoom), maxZoom);
-    svg.style.transform = `scale(${zoomLevel})`;
+    if (!wheelRect.width || !wheelRect.height) return null;
+
+    return {
+      viewportX: clientX - viewportRect.left,
+      viewportY: clientY - viewportRect.top,
+      wheelX: (clientX - wheelRect.left) / wheelRect.width,
+      wheelY: (clientY - wheelRect.top) / wheelRect.height
+    };
+  }
+
+  function rememberViewportCenter() {
+    if (!metrics) return;
+    if (
+      viewport.clientWidth !== metrics.viewportWidth ||
+      viewport.clientHeight !== metrics.viewportHeight
+    ) return;
+
+    centerWheelPoint = {
+      x: (viewport.scrollLeft + metrics.viewportWidth / 2 - metrics.wheelLeft) / metrics.wheelSize,
+      y: (viewport.scrollTop + metrics.viewportHeight / 2 - metrics.wheelTop) / metrics.wheelSize
+    };
+  }
+
+  function layoutWheel(anchor = null) {
+    const viewportWidth = viewport.clientWidth;
+    const viewportHeight = viewport.clientHeight;
+    if (!viewportWidth || !viewportHeight) return;
+
+    const fittedSize = Math.min(viewportWidth, viewportHeight);
+    const wheelSize = fittedSize * zoomLevel;
+    const stageWidth = Math.max(viewportWidth, wheelSize);
+    const stageHeight = Math.max(viewportHeight, wheelSize);
+    const wheelLeft = (stageWidth - wheelSize) / 2;
+    const wheelTop = (stageHeight - wheelSize) / 2;
+
+    stage.style.width = `${stageWidth}px`;
+    stage.style.height = `${stageHeight}px`;
+    wheel.style.width = `${wheelSize}px`;
+    wheel.style.height = `${wheelSize}px`;
+    wheel.style.left = `${wheelLeft}px`;
+    wheel.style.top = `${wheelTop}px`;
+    wheel.dataset.zoom = zoomLevel.toFixed(3);
+
+    metrics = {
+      viewportWidth,
+      viewportHeight,
+      wheelSize,
+      wheelLeft,
+      wheelTop
+    };
+
+    if (anchor) {
+      viewport.scrollLeft = wheelLeft + anchor.wheelX * wheelSize - anchor.viewportX;
+      viewport.scrollTop = wheelTop + anchor.wheelY * wheelSize - anchor.viewportY;
+    } else if (!initialized) {
+      viewport.scrollLeft = (stageWidth - viewportWidth) / 2;
+      viewport.scrollTop = (stageHeight - viewportHeight) / 2;
+    }
+
+    initialized = true;
+    rememberViewportCenter();
+  }
+
+  viewport.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    const anchor = captureAnchor(event.clientX, event.clientY);
+    const nextZoom = Math.min(
+      maxZoom,
+      Math.max(minZoom, zoomLevel * Math.exp(-event.deltaY * 0.0015))
+    );
+
+    if (nextZoom === zoomLevel) return;
+    zoomLevel = nextZoom;
+    layoutWheel(anchor);
+  }, { passive: false });
+
+  viewport.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    dragState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      scrollLeft: viewport.scrollLeft,
+      scrollTop: viewport.scrollTop,
+      moved: false
+    };
   });
+
+  viewport.addEventListener("pointermove", (event) => {
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - dragState.startX;
+    const deltaY = event.clientY - dragState.startY;
+
+    if (!dragState.moved && Math.hypot(deltaX, deltaY) < 4) return;
+    if (!dragState.moved) viewport.setPointerCapture(event.pointerId);
+    dragState.moved = true;
+    viewport.classList.add("is-panning");
+    viewport.scrollLeft = dragState.scrollLeft - deltaX;
+    viewport.scrollTop = dragState.scrollTop - deltaY;
+  });
+
+  function endDrag(event) {
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+    if (dragState.moved) {
+      suppressNextClick = true;
+      setTimeout(() => { suppressNextClick = false; }, 50);
+    }
+
+    if (viewport.hasPointerCapture(event.pointerId)) {
+      viewport.releasePointerCapture(event.pointerId);
+    }
+    dragState = null;
+    viewport.classList.remove("is-panning");
+  }
+
+  viewport.addEventListener("pointerup", endDrag);
+  viewport.addEventListener("pointercancel", endDrag);
+  viewport.addEventListener("scroll", rememberViewportCenter, { passive: true });
+  viewport.addEventListener("click", (event) => {
+    if (!suppressNextClick) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
+
+  const resizeObserver = new ResizeObserver(() => {
+    if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = null;
+      const anchor = initialized ? {
+        viewportX: viewport.clientWidth / 2,
+        viewportY: viewport.clientHeight / 2,
+        wheelX: centerWheelPoint.x,
+        wheelY: centerWheelPoint.y
+      } : null;
+      layoutWheel(anchor);
+    });
+  });
+  resizeObserver.observe(viewport);
+  layoutWheel();
 }
 
 for (const node of visualNodes) {
   const innerR = ringStartRadius[node.depth];
   const outerR = innerR + ringWidths[node.depth];
-  drawArcWedge(centerX, centerY, innerR, outerR, node.angle, node.sweep, node.color, node.label);
+  drawArcWedge(
+    centerX,
+    centerY,
+    innerR,
+    outerR,
+    node.angle,
+    node.sweep,
+    node.color,
+    node.label,
+    node.id,
+    node.depth
+  );
 }
 
-setupZoomListener(svg);
+setupWheelNavigation(emotionContainer, wheelStage, svg);
 
+const popup = document.getElementById("popup");
+const popupLabel = document.getElementById("popup-label");
+const popupEnglish = document.getElementById("popup-english");
+const popupExpand = document.getElementById("popup-expand");
+const popupDetails = document.getElementById("popup-details");
+const popupDefinition = document.getElementById("popup-definition");
+const definitionEnglish = document.getElementById("definition-english");
+const definitionTranslated = document.getElementById("definition-translated");
+const definitionCache = new Map();
+let selectedNodeId = null;
+let definitionLanguage = "en";
+let lastPopupWheelStep = 0;
 
+function highlightNode(nodeId) {
+  svg.querySelectorAll(".is-active").forEach((element) => element.classList.remove("is-active"));
+  svg.querySelectorAll(`[data-node-id="${nodeId}"]`)
+    .forEach((element) => element.classList.add("is-active"));
+}
 
-function showPopup(label, color) {
-  const popup = document.getElementById("popup");
-  const popupLabel = document.getElementById("popup-label");
-  const popupEnglish = document.getElementById("popup-english");
+function showPopup(label, color, nodeId = selectedNodeId) {
   const language = languages.find(({ code }) => code === selectedLanguage);
 
+  selectedNodeId = String(nodeId);
   popup.dataset.englishLabel = label;
   popup.dataset.color = color;
+  popup.dataset.nodeId = selectedNodeId;
   popupLabel.textContent = translateEmotion(label, selectedLanguage);
   popupLabel.dir = language?.direction ?? "ltr";
   popupEnglish.textContent = selectedLanguage === "en" ? "" : `English: ${label}`;
   popupEnglish.hidden = selectedLanguage === "en";
   popup.style.borderColor = color;
+  popup.style.boxShadow = `0 12px 40px rgba(0, 0, 0, 0.35), 0 0 28px ${color}`;
+  positionPopup();
   popup.hidden = false;
+  definitionTranslated.textContent = language?.name ?? "Selected language";
+  definitionTranslated.disabled = selectedLanguage === "en";
+  highlightNode(selectedNodeId);
+
+  if (!popupDetails.hidden) renderDefinition();
 }
 
+function positionPopup() {
+  const viewportRect = emotionContainer.getBoundingClientRect();
+  popup.style.left = `${viewportRect.left + viewportRect.width / 2}px`;
+}
+
+new ResizeObserver(positionPopup).observe(emotionContainer);
+
 function hidePopup() {
-  document.getElementById("popup").hidden = true;
+  popup.hidden = true;
+  selectedNodeId = null;
+  svg.querySelectorAll(".is-active").forEach((element) => element.classList.remove("is-active"));
 }
 
 // Close when clicking the ✖
 document.getElementById("popup-close").addEventListener("click", hidePopup);
 
+function cycleSelectedNode(direction) {
+  const selectedNode = visualNodes.find(({ id }) => id === selectedNodeId);
+  if (!selectedNode) return;
+
+  const ringNodes = visualNodes.filter(({ depth }) => depth === selectedNode.depth);
+  const currentIndex = ringNodes.findIndex(({ id }) => id === selectedNode.id);
+  const nextIndex = (currentIndex + direction + ringNodes.length) % ringNodes.length;
+  const nextNode = ringNodes[nextIndex];
+  showPopup(nextNode.label, nextNode.color, nextNode.id);
+}
+
+popup.addEventListener("wheel", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const now = performance.now();
+  if (event.deltaY === 0 || now - lastPopupWheelStep < 140) return;
+
+  lastPopupWheelStep = now;
+  cycleSelectedNode(event.deltaY > 0 ? 1 : -1);
+}, { passive: false });
+
+popupExpand.addEventListener("click", () => {
+  popupDetails.hidden = !popupDetails.hidden;
+  popupExpand.setAttribute("aria-expanded", String(!popupDetails.hidden));
+  popupExpand.textContent = popupDetails.hidden ? "More details" : "Fewer details";
+  if (!popupDetails.hidden) renderDefinition();
+});
+
+definitionEnglish.addEventListener("click", () => {
+  definitionLanguage = "en";
+  renderDefinition();
+});
+
+definitionTranslated.addEventListener("click", () => {
+  definitionLanguage = selectedLanguage;
+  renderDefinition();
+});
+
+async function fetchEnglishDefinition(label) {
+  const key = `en:${label}`;
+  if (definitionCache.has(key)) return definitionCache.get(key);
+
+  let definition = `A feeling or emotional state described as ${label.toLowerCase()}.`;
+  try {
+    const response = await fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(label)}`
+    );
+    if (response.ok) {
+      const entries = await response.json();
+      const candidate = entries
+        .flatMap((entry) => entry.meanings ?? [])
+        .flatMap((meaning) => meaning.definitions ?? [])
+        .find((item) => item.definition)?.definition;
+      if (candidate) definition = candidate;
+    }
+  } catch {
+    // The concise fallback keeps details usable offline.
+  }
+
+  definitionCache.set(key, definition);
+  return definition;
+}
+
+async function fetchTranslatedDefinition(label, languageCode) {
+  const key = `${languageCode}:${label}`;
+  if (definitionCache.has(key)) return definitionCache.get(key);
+
+  const englishDefinition = await fetchEnglishDefinition(label);
+  try {
+    const endpoint = new URL("https://translate.googleapis.com/translate_a/single");
+    endpoint.search = new URLSearchParams({
+      client: "gtx",
+      sl: "en",
+      tl: languageCode,
+      dt: "t",
+      q: englishDefinition
+    });
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("Translation request failed");
+    const data = await response.json();
+    const translated = data[0].map((part) => part[0]).join("");
+    definitionCache.set(key, translated);
+    return translated;
+  } catch {
+    return `${englishDefinition} (English definition; translated definition unavailable.)`;
+  }
+}
+
+async function renderDefinition() {
+  const label = popup.dataset.englishLabel;
+  if (!label) return;
+
+  const requestedLanguage = definitionLanguage === "en" ? "en" : selectedLanguage;
+  definitionLanguage = requestedLanguage;
+  definitionEnglish.classList.toggle("is-active", requestedLanguage === "en");
+  definitionTranslated.classList.toggle("is-active", requestedLanguage !== "en");
+  popupDefinition.dir = requestedLanguage === "fa" ? "rtl" : "ltr";
+  popupDefinition.textContent = "Loading definition…";
+
+  const definition = requestedLanguage === "en"
+    ? await fetchEnglishDefinition(label)
+    : await fetchTranslatedDefinition(label, requestedLanguage);
+
+  if (popup.dataset.englishLabel === label && !popupDetails.hidden) {
+    popupDefinition.textContent = definition;
+  }
+}
+
 function setLanguage(languageCode) {
   const language = languages.find(({ code }) => code === languageCode) ?? languages[0];
   selectedLanguage = language.code;
+  languageCurrent.textContent = language.name;
   document.documentElement.lang = language.code;
   translationRoute.textContent = language.code === "en"
     ? "English reference"
@@ -375,18 +680,84 @@ function setLanguage(languageCode) {
     url.searchParams.set("lang", language.code);
   }
   history.replaceState(null, "", url);
+
+  languageOptions.querySelectorAll(".language-option").forEach((row) => {
+    row.classList.toggle("is-selected", row.dataset.language === language.code);
+    row.setAttribute("aria-selected", String(row.dataset.language === language.code));
+  });
 }
 
 for (const language of languages) {
-  const option = document.createElement("option");
-  option.value = language.code;
-  option.textContent = language.name;
-  languageSelect.appendChild(option);
+  const row = document.createElement("li");
+  row.className = "language-option";
+  row.dataset.language = language.code;
+  row.setAttribute("role", "option");
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = true;
+  checkbox.setAttribute("aria-label", `Include ${language.name} when scrolling`);
+
+  const nameButton = document.createElement("button");
+  nameButton.type = "button";
+  nameButton.className = "language-name";
+  nameButton.textContent = language.name;
+
+  checkbox.addEventListener("change", () => {
+    if (checkbox.checked) {
+      enabledLanguages.add(language.code);
+    } else {
+      enabledLanguages.delete(language.code);
+    }
+    row.classList.toggle("is-disabled", !checkbox.checked);
+    saveEnabledLanguages();
+  });
+
+  nameButton.addEventListener("click", () => {
+    checkbox.checked = true;
+    enabledLanguages.add(language.code);
+    row.classList.remove("is-disabled");
+    saveEnabledLanguages();
+    setLanguage(language.code);
+    closeLanguageMenu();
+  });
+
+  row.append(checkbox, nameButton);
+  languageOptions.appendChild(row);
+}
+
+function saveEnabledLanguages() {
+  try {
+    localStorage.setItem("emotion-wheel-enabled-languages", JSON.stringify([...enabledLanguages]));
+  } catch {
+    // Language filter persistence is optional when storage is unavailable.
+  }
+}
+
+function syncEnabledLanguageRows() {
+  languageOptions.querySelectorAll(".language-option").forEach((row) => {
+    const enabled = enabledLanguages.has(row.dataset.language);
+    row.querySelector("input").checked = enabled;
+    row.classList.toggle("is-disabled", !enabled);
+  });
+}
+
+function closeLanguageMenu() {
+  languageMenu.hidden = true;
+  languageCurrent.setAttribute("aria-expanded", "false");
 }
 
 try {
   const requestedLanguage = new URLSearchParams(window.location.search).get("lang");
   const savedLanguage = localStorage.getItem("emotion-wheel-language");
+  const savedEnabledLanguages = JSON.parse(
+    localStorage.getItem("emotion-wheel-enabled-languages") ?? "null"
+  );
+  if (Array.isArray(savedEnabledLanguages)) {
+    enabledLanguages = new Set(
+      savedEnabledLanguages.filter((code) => languages.some((language) => language.code === code))
+    );
+  }
   if (languages.some(({ code }) => code === requestedLanguage)) {
     selectedLanguage = requestedLanguage;
   } else if (languages.some(({ code }) => code === savedLanguage)) {
@@ -396,27 +767,26 @@ try {
   // Default to English when storage is unavailable.
 }
 
-languageSelect.value = selectedLanguage;
+syncEnabledLanguageRows();
 setLanguage(selectedLanguage);
-languageSelect.addEventListener("change", () => {
-  setLanguage(languageSelect.value);
-  sidebar.classList.remove("is-open");
-  sidebarToggle.textContent = "Languages";
-  sidebarToggle.setAttribute("aria-expanded", "false");
+
+languageCurrent.addEventListener("click", () => {
+  languageMenu.hidden = !languageMenu.hidden;
+  languageCurrent.setAttribute("aria-expanded", String(!languageMenu.hidden));
 });
 
 function cycleLanguage(direction) {
-  const currentIndex = Math.max(
-    0,
-    languages.findIndex(({ code }) => code === languageSelect.value)
-  );
-  const nextIndex = (currentIndex + direction + languages.length) % languages.length;
-  languageSelect.value = languages[nextIndex].code;
-  setLanguage(languageSelect.value);
+  const availableLanguages = languages.filter(({ code }) => enabledLanguages.has(code));
+  if (availableLanguages.length === 0) return;
+
+  const currentIndex = availableLanguages.findIndex(({ code }) => code === selectedLanguage);
+  const startIndex = currentIndex === -1 ? (direction > 0 ? -1 : 0) : currentIndex;
+  const nextIndex = (startIndex + direction + availableLanguages.length) % availableLanguages.length;
+  setLanguage(availableLanguages[nextIndex].code);
 }
 
 let lastLanguageWheelStep = 0;
-languageSelect.addEventListener("wheel", (event) => {
+languageCurrent.addEventListener("wheel", (event) => {
   event.preventDefault();
   event.stopPropagation();
 
@@ -427,24 +797,60 @@ languageSelect.addEventListener("wheel", (event) => {
   cycleLanguage(event.deltaY > 0 ? 1 : -1);
 }, { passive: false });
 
-languageSelect.addEventListener("keydown", (event) => {
+languageCurrent.addEventListener("keydown", (event) => {
   if (event.altKey || !["ArrowUp", "ArrowDown"].includes(event.key)) return;
   event.preventDefault();
   cycleLanguage(event.key === "ArrowDown" ? 1 : -1);
 });
 
+languagesAll.addEventListener("click", () => {
+  enabledLanguages = new Set(languages.map(({ code }) => code));
+  syncEnabledLanguageRows();
+  saveEnabledLanguages();
+});
+
+languagesNone.addEventListener("click", () => {
+  enabledLanguages.clear();
+  syncEnabledLanguageRows();
+  saveEnabledLanguages();
+});
+
+document.addEventListener("click", (event) => {
+  if (!event.target.closest("#language-picker")) closeLanguageMenu();
+});
+
+function setSidebarCollapsed(collapsed) {
+  document.body.classList.toggle("sidebar-collapsed", collapsed);
+  sidebarToggle.textContent = collapsed ? "›" : "‹";
+  sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+  sidebarToggle.setAttribute(
+    "aria-label",
+    collapsed ? "Expand language sidebar" : "Collapse language sidebar"
+  );
+  try {
+    localStorage.setItem("emotion-wheel-sidebar-collapsed", String(collapsed));
+  } catch {
+    // Sidebar persistence is optional when storage is unavailable.
+  }
+}
+
+let sidebarCollapsed = window.matchMedia("(max-width: 760px)").matches;
+try {
+  const savedSidebarState = localStorage.getItem("emotion-wheel-sidebar-collapsed");
+  if (savedSidebarState !== null) sidebarCollapsed = savedSidebarState === "true";
+} catch {
+  // Use the viewport-aware default when storage is unavailable.
+}
+setSidebarCollapsed(sidebarCollapsed);
+
 sidebarToggle.addEventListener("click", () => {
-  const isOpen = sidebar.classList.toggle("is-open");
-  sidebarToggle.textContent = isOpen ? "Close" : "Languages";
-  sidebarToggle.setAttribute("aria-expanded", String(isOpen));
+  setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
 });
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   hidePopup();
-  sidebar.classList.remove("is-open");
-  sidebarToggle.textContent = "Languages";
-  sidebarToggle.setAttribute("aria-expanded", "false");
+  closeLanguageMenu();
 });
 
 
