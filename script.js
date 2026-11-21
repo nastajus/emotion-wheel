@@ -201,6 +201,8 @@ const languagesNone = document.getElementById("languages-none");
 const translationRoute = document.getElementById("translation-route");
 const sidebarToggle = document.getElementById("sidebar-toggle");
 const helpDialog = document.getElementById("help-dialog");
+const sidebarMain = document.getElementById("sidebar-main");
+const sidebarAbout = document.getElementById("sidebar-about");
 let selectedLanguage = "en";
 let enabledLanguages = new Set(languages.map(({ code }) => code));
 const centerX = 200;
@@ -815,6 +817,19 @@ setSidebarCollapsed(sidebarCollapsed);
 
 sidebarToggle.addEventListener("click", () => {
   setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
+});
+
+document.getElementById("about-open").addEventListener("click", () => {
+  closeLanguageMenu();
+  sidebarMain.hidden = true;
+  sidebarAbout.hidden = false;
+  document.getElementById("about-back").focus();
+});
+
+document.getElementById("about-back").addEventListener("click", () => {
+  sidebarAbout.hidden = true;
+  sidebarMain.hidden = false;
+  document.getElementById("about-open").focus();
 });
 
 document.getElementById("help-open").addEventListener("click", () => helpDialog.showModal());

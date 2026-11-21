@@ -8,50 +8,68 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <aside id="language-sidebar" aria-label="Language settings">
-    <div class="sidebar-heading">
-      <p class="eyebrow">Emotion wheel</p>
-      <h1>Find the right word</h1>
-    </div>
+  <aside id="language-sidebar" aria-label="Wheel controls and information">
+    <div id="sidebar-main" class="sidebar-view">
+      <div class="sidebar-heading">
+        <p class="eyebrow">Emotion wheel</p>
+        <h1>Find the right word</h1>
+      </div>
 
-    <span class="control-label">Language</span>
-    <div id="language-picker">
-      <button id="language-current" type="button" aria-haspopup="listbox" aria-expanded="false" aria-describedby="language-scroll-help"></button>
-      <div id="language-menu" hidden>
-        <div class="language-actions">
-          <button id="languages-all" type="button">Check all</button>
-          <button id="languages-none" type="button">Check none</button>
+      <span class="control-label">Language</span>
+      <div id="language-picker">
+        <button id="language-current" type="button" aria-haspopup="listbox" aria-expanded="false" aria-describedby="language-scroll-help"></button>
+        <div id="language-menu" hidden>
+          <div class="language-actions">
+            <button id="languages-all" type="button">Check all</button>
+            <button id="languages-none" type="button">Check none</button>
+          </div>
+          <ul id="language-options" role="listbox" aria-label="Languages"></ul>
         </div>
-        <ul id="language-options" role="listbox" aria-label="Languages"></ul>
+      </div>
+      <p id="translation-route" aria-live="polite">English → English</p>
+
+      <button id="about-open" class="sidebar-navigation" type="button" aria-controls="sidebar-about">
+        <span>About this wheel</span><span aria-hidden="true">›</span>
+      </button>
+
+      <section class="navigation-legend" aria-labelledby="navigation-heading">
+        <div class="legend-heading">
+          <h2 id="navigation-heading">Navigation</h2>
+          <button id="help-open" type="button" aria-haspopup="dialog">All controls</button>
+        </div>
+        <dl>
+          <div><dt>Pan</dt><dd><kbd>Drag</kbd></dd></div>
+          <div><dt>Zoom</dt><dd><kbd>Scroll</kbd></dd></div>
+          <div><dt>Next word</dt><dd><kbd>Shift</kbd><span>+</span><kbd>Scroll</kbd></dd></div>
+          <div><dt>Sidebar</dt><dd><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Alt</kbd><span>+</span><kbd>S</kbd></dd></div>
+        </dl>
+        <p id="language-scroll-help">Hover over the language selector and scroll to cycle. The list loops.</p>
+      </section>
+    </div>
+
+    <div id="sidebar-about" class="sidebar-view" hidden>
+      <button id="about-back" class="sidebar-back" type="button" aria-controls="sidebar-main">
+        <span aria-hidden="true">‹</span> Back
+      </button>
+      <div class="sidebar-heading">
+        <p class="eyebrow">About</p>
+        <h1>Language and sources</h1>
+      </div>
+      <div class="about-content">
+        <section>
+          <h2>About translation</h2>
+          <p>English is the reference vocabulary. Emotion words do not always map one-to-one across languages, so some labels are close interpretations rather than exact equivalents.</p>
+        </section>
+        <section>
+          <h2>Definition origin</h2>
+          <p>English definitions were AI-drafted for this project. Non-English versions are machine-translated from those drafts. They are bundled locally and have not been professionally reviewed.</p>
+        </section>
+        <section>
+          <h2>Primary reference</h2>
+          <p>Vocabulary and hierarchy are based primarily on the <a href="https://www.thejuntoinstitute.com/2024/08/28/emotion-wheels/" target="_blank" rel="noreferrer">Junto Emotion Wheel</a>.</p>
+        </section>
       </div>
     </div>
-    <p id="translation-route" aria-live="polite">English → English</p>
-
-    <div class="translation-note">
-      <h2>About translation</h2>
-      <p>English is the reference vocabulary. Emotion words do not always map one-to-one across languages, so some labels are close interpretations rather than exact equivalents.</p>
-      <h2>Definition origin</h2>
-      <p>English definitions were AI-drafted for this project. Non-English versions are machine-translated from those drafts. They are bundled locally and have not been professionally reviewed.</p>
-    </div>
-
-    <section class="navigation-legend" aria-labelledby="navigation-heading">
-      <div class="legend-heading">
-        <h2 id="navigation-heading">Navigation</h2>
-        <button id="help-open" type="button" aria-haspopup="dialog">All controls</button>
-      </div>
-      <dl>
-        <div><dt>Pan</dt><dd><kbd>Drag</kbd></dd></div>
-        <div><dt>Zoom</dt><dd><kbd>Scroll</kbd></dd></div>
-        <div><dt>Next word</dt><dd><kbd>Shift</kbd><span>+</span><kbd>Scroll</kbd></dd></div>
-        <div><dt>Sidebar</dt><dd><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Alt</kbd><span>+</span><kbd>S</kbd></dd></div>
-      </dl>
-      <p id="language-scroll-help">Hover over the language selector and scroll to cycle. The list loops.</p>
-    </section>
-
-    <p class="source-note">
-      Vocabulary based primarily on the
-      <a href="https://www.thejuntoinstitute.com/2024/08/28/emotion-wheels/" target="_blank" rel="noreferrer">Junto Emotion Wheel</a>.
-    </p>
   </aside>
 
   <button id="sidebar-toggle" type="button" aria-controls="language-sidebar" aria-expanded="true" aria-label="Collapse language sidebar">

@@ -45,6 +45,7 @@ This project should therefore be understood as an interface and data-visualizati
 - Fits translated labels to their wedges and handles Persian right-to-left text.
 - Collapses the language sidebar from its always-visible edge handle.
 - Toggles the sidebar with `Ctrl` + `Shift` + `Alt` + `S` and includes an expandable navigation reference.
+- Keeps translation, definition provenance, and the Junto reference in a nested sidebar About view.
 - Prints the wheel by itself on one landscape Letter page.
 - Can switch between the Junto-derived data and a smaller test tree in the source.
 
