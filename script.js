@@ -390,7 +390,7 @@ function setupWheelNavigation(viewport, stage, wheel, onWordWheel) {
     const wordDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX)
       ? event.deltaY
       : event.deltaX;
-    if (event.shiftKey && wordDelta !== 0 && onWordWheel(wordDelta > 0 ? 1 : -1)) return;
+    if (event.shiftKey && onWordWheel(Math.sign(wordDelta))) return;
 
     const anchor = captureAnchor(event.clientX, event.clientY);
     const nextZoom = Math.min(
@@ -488,7 +488,8 @@ for (const node of visualNodes) {
 
 setupWheelNavigation(emotionContainer, wheelStage, svg, (direction) => {
   if (selectedNodeId === null) return false;
-  return cycleSelectedNode(direction);
+  if (direction !== 0) cycleSelectedNode(direction);
+  return true;
 });
 
 const popup = document.getElementById("popup");
@@ -547,6 +548,11 @@ function hidePopup() {
   selectedNodeId = null;
   svg.querySelectorAll(".is-active").forEach((element) => element.classList.remove("is-active"));
 }
+
+emotionContainer.addEventListener("click", (event) => {
+  if (event.target.closest("[data-node-id]")) return;
+  hidePopup();
+});
 
 // Close when clicking the ✖
 document.getElementById("popup-close").addEventListener("click", hidePopup);

@@ -33,6 +33,7 @@ This project should therefore be understood as an interface and data-visualizati
 - Supports cursor-centered mouse-wheel zoom and click-drag or touch panning across the wheel's full bounds.
 - Recalculates navigation bounds from the available viewport, keeping the wheel reachable when the surrounding layout changes size.
 - Distinguishes a stationary click from a drag: click a word to select it and open its popup; drag to pan.
+- Clears the selection when the wheel center or surrounding canvas is clicked.
 - Highlights the selected wedge and cycles through adjacent words on the same ring when scrolling over the popup.
 - Cycles through adjacent words from anywhere over the wheel with `Shift` + scroll.
 - Expands English and selected-language definitions independently, so either or both can be visible.
