@@ -200,6 +200,7 @@ const languagesAll = document.getElementById("languages-all");
 const languagesNone = document.getElementById("languages-none");
 const translationRoute = document.getElementById("translation-route");
 const sidebarToggle = document.getElementById("sidebar-toggle");
+const helpDialog = document.getElementById("help-dialog");
 let selectedLanguage = "en";
 let enabledLanguages = new Set(languages.map(({ code }) => code));
 const centerX = 200;
@@ -306,7 +307,7 @@ function fitLabel(text, availableWidth) {
   }
 }
 
-function setupWheelNavigation(viewport, stage, wheel) {
+function setupWheelNavigation(viewport, stage, wheel, onWordWheel) {
   let zoomLevel = 1;
   let initialized = false;
   let resizeFrame = null;
@@ -386,6 +387,11 @@ function setupWheelNavigation(viewport, stage, wheel) {
 
   viewport.addEventListener("wheel", (event) => {
     event.preventDefault();
+    const wordDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+      ? event.deltaY
+      : event.deltaX;
+    if (event.shiftKey && wordDelta !== 0 && onWordWheel(wordDelta > 0 ? 1 : -1)) return;
+
     const anchor = captureAnchor(event.clientX, event.clientY);
     const nextZoom = Math.min(
       maxZoom,
@@ -480,7 +486,10 @@ for (const node of visualNodes) {
   );
 }
 
-setupWheelNavigation(emotionContainer, wheelStage, svg);
+setupWheelNavigation(emotionContainer, wheelStage, svg, (direction) => {
+  if (selectedNodeId === null) return false;
+  return cycleSelectedNode(direction);
+});
 
 const popup = document.getElementById("popup");
 const popupLabel = document.getElementById("popup-label");
@@ -493,7 +502,8 @@ const definitionTranslatedPanel = document.getElementById("definition-translated
 const definitionTranslatedText = document.getElementById("definition-translated-text");
 const definitionTranslatedName = document.getElementById("definition-translated-name");
 let selectedNodeId = null;
-let lastPopupWheelStep = 0;
+let lastWordWheelStep = 0;
+const wordWheelInterval = 60;
 
 function highlightNode(nodeId) {
   svg.querySelectorAll(".is-active").forEach((element) => element.classList.remove("is-active"));
@@ -542,24 +552,29 @@ function hidePopup() {
 document.getElementById("popup-close").addEventListener("click", hidePopup);
 
 function cycleSelectedNode(direction) {
+  const now = performance.now();
+  if (now - lastWordWheelStep < wordWheelInterval) return false;
+  lastWordWheelStep = now;
+  return stepSelectedNode(direction);
+}
+
+function stepSelectedNode(direction) {
   const selectedNode = visualNodes.find(({ id }) => id === selectedNodeId);
-  if (!selectedNode) return;
+  if (!selectedNode) return false;
 
   const ringNodes = visualNodes.filter(({ depth }) => depth === selectedNode.depth);
   const currentIndex = ringNodes.findIndex(({ id }) => id === selectedNode.id);
   const nextIndex = (currentIndex + direction + ringNodes.length) % ringNodes.length;
   const nextNode = ringNodes[nextIndex];
   showPopup(nextNode.label, nextNode.color, nextNode.id);
+  return true;
 }
 
 popup.addEventListener("wheel", (event) => {
   event.preventDefault();
   event.stopPropagation();
 
-  const now = performance.now();
-  if (event.deltaY === 0 || now - lastPopupWheelStep < 140) return;
-
-  lastPopupWheelStep = now;
+  if (event.deltaY === 0) return;
   cycleSelectedNode(event.deltaY > 0 ? 1 : -1);
 }, { passive: false });
 
@@ -796,10 +811,35 @@ sidebarToggle.addEventListener("click", () => {
   setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
 });
 
+document.getElementById("help-open").addEventListener("click", () => helpDialog.showModal());
+document.getElementById("help-close").addEventListener("click", () => helpDialog.close());
+helpDialog.addEventListener("click", (event) => {
+  const rect = helpDialog.getBoundingClientRect();
+  const clickedBackdrop =
+    event.clientX < rect.left ||
+    event.clientX > rect.right ||
+    event.clientY < rect.top ||
+    event.clientY > rect.bottom;
+  if (clickedBackdrop) helpDialog.close();
+});
+
 document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape") return;
-  hidePopup();
-  closeLanguageMenu();
+  if (
+    event.ctrlKey &&
+    event.shiftKey &&
+    event.altKey &&
+    event.key.toLowerCase() === "s"
+  ) {
+    event.preventDefault();
+    if (event.repeat) return;
+    setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
+    return;
+  }
+
+  if (event.key === "Escape") {
+    hidePopup();
+    closeLanguageMenu();
+  }
 });
 
 

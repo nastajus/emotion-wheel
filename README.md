@@ -34,6 +34,7 @@ This project should therefore be understood as an interface and data-visualizati
 - Recalculates navigation bounds from the available viewport, keeping the wheel reachable when the surrounding layout changes size.
 - Distinguishes a stationary click from a drag: click a word to select it and open its popup; drag to pan.
 - Highlights the selected wedge and cycles through adjacent words on the same ring when scrolling over the popup.
+- Cycles through adjacent words from anywhere over the wheel with `Shift` + scroll.
 - Expands English and selected-language definitions independently, so either or both can be visible.
 - Bundles all definitions with the project for instant lookup without network requests.
 - Switches instantly between English, Spanish, French, German, Lithuanian, Japanese, Simplified Chinese, Russian, Persian, and Vietnamese.
@@ -42,6 +43,7 @@ This project should therefore be understood as an interface and data-visualizati
 - Keeps the canonical English term visible in translated popups and supports shareable `?lang=` URLs.
 - Fits translated labels to their wedges and handles Persian right-to-left text.
 - Collapses the language sidebar from its always-visible edge handle.
+- Toggles the sidebar with `Ctrl` + `Shift` + `Alt` + `S` and includes an expandable navigation reference.
 - Prints the wheel by itself on one landscape Letter page.
 - Can switch between the Junto-derived data and a smaller test tree in the source.
 
@@ -97,7 +99,7 @@ If a top-level `baseHue` is not supplied, the renderer assigns one by distributi
 
 The renderer was designed with interchangeable trees in mind, but it is not yet a general-purpose hierarchy visualizer. The active version assumes exactly three displayed levels and gives siblings equal angular width. A separate refactor branch explores recursive layout and configuration, but remains unfinished.
 
-Translations are bundled in [`translations.js`](translations.js), and the definition catalog is bundled in [`definitions.js`](definitions.js), so switching languages and opening definitions work without runtime network requests. They were developed from machine-assisted drafts with context-specific corrections for ambiguous emotion words. They have not been professionally reviewed in every language; corrections and culturally better equivalents are welcome.
+Translations are bundled in [`translations.js`](translations.js), and the definition catalog is bundled in [`definitions.js`](definitions.js), so switching languages and opening definitions work without runtime network requests. The English definitions were AI-drafted specifically for this project; non-English definitions were machine-translated from those drafts. Labels include context-specific corrections for ambiguous emotion words, but the complete catalog has not been professionally reviewed in every language. Corrections and culturally better equivalents are welcome.
 
 ## Scope and possible directions
 

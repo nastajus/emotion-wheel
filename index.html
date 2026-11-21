@@ -16,7 +16,7 @@
 
     <span class="control-label">Language</span>
     <div id="language-picker">
-      <button id="language-current" type="button" aria-haspopup="listbox" aria-expanded="false" aria-describedby="language-hint"></button>
+      <button id="language-current" type="button" aria-haspopup="listbox" aria-expanded="false" aria-describedby="language-scroll-help"></button>
       <div id="language-menu" hidden>
         <div class="language-actions">
           <button id="languages-all" type="button">Check all</button>
@@ -26,12 +26,27 @@
       </div>
     </div>
     <p id="translation-route" aria-live="polite">English → English</p>
-    <p id="language-hint">Hover and scroll to cycle. The list loops.</p>
 
     <div class="translation-note">
       <h2>About translation</h2>
       <p>English is the reference vocabulary. Emotion words do not always map one-to-one across languages, so some labels are close interpretations rather than exact equivalents.</p>
+      <h2>Definition origin</h2>
+      <p>English definitions were AI-drafted for this project. Non-English versions are machine-translated from those drafts. They are bundled locally and have not been professionally reviewed.</p>
     </div>
+
+    <section class="navigation-legend" aria-labelledby="navigation-heading">
+      <div class="legend-heading">
+        <h2 id="navigation-heading">Navigation</h2>
+        <button id="help-open" type="button" aria-haspopup="dialog">All controls</button>
+      </div>
+      <dl>
+        <div><dt>Pan</dt><dd><kbd>Drag</kbd></dd></div>
+        <div><dt>Zoom</dt><dd><kbd>Scroll</kbd></dd></div>
+        <div><dt>Next word</dt><dd><kbd>Shift</kbd><span>+</span><kbd>Scroll</kbd></dd></div>
+        <div><dt>Sidebar</dt><dd><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Alt</kbd><span>+</span><kbd>S</kbd></dd></div>
+      </dl>
+      <p id="language-scroll-help">Hover over the language selector and scroll to cycle. The list loops.</p>
+    </section>
 
     <p class="source-note">
       Vocabulary based primarily on the
@@ -71,10 +86,22 @@
       <div id="definition-translated-panel" class="definition-panel" hidden>
         <p id="definition-translated-text"></p>
       </div>
-
-      <p class="definition-source">Definitions are bundled for instant lookup. Non-English definitions are machine-assisted.</p>
     </div>
   </div>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <button id="help-close" type="button" aria-label="Close navigation help">×</button>
+    <h2 id="help-title">Navigation controls</h2>
+    <dl class="help-controls">
+      <div><dt>Open a word</dt><dd>Click or tap a word. Release without dragging.</dd></div>
+      <div><dt>Pan the wheel</dt><dd>Drag anywhere across the wheel.</dd></div>
+      <div><dt>Zoom</dt><dd>Scroll over the wheel. Zoom stays centered beneath the pointer.</dd></div>
+      <div><dt>Explore a ring</dt><dd>Scroll over an open word popup, or hold <kbd>Shift</kbd> and scroll anywhere over the wheel.</dd></div>
+      <div><dt>Cycle languages</dt><dd>Hover over the language selector and scroll. Only checked languages are included, and the list loops.</dd></div>
+      <div><dt>Toggle sidebar</dt><dd>Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd>.</dd></div>
+      <div><dt>Close</dt><dd>Press <kbd>Esc</kbd> to close popups and menus.</dd></div>
+    </dl>
+  </dialog>
   <script type="module" src="script.js"></script>
 </body>
 </html>
