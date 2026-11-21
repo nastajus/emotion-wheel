@@ -207,18 +207,23 @@ h1 {
   min-height: 38px;
   padding: 0;
   border-top: 1px solid #353832;
-  border-bottom: 1px solid #353832;
   font-size: 0.78rem;
 }
 
 .sidebar-navigation span:last-child { font-size: 1.2rem; }
 
 .sidebar-back {
-  align-self: flex-start;
+  align-self: stretch;
+  justify-content: flex-start;
   gap: 7px;
-  min-height: 32px;
-  padding: 0 4px 0 0;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #454942;
+  border-radius: 5px;
+  background: #242623;
+  color: #d4eee3;
   font-size: 0.78rem;
+  font-weight: 650;
 }
 
 .sidebar-back span { font-size: 1.2rem; }
@@ -295,13 +300,6 @@ h1 {
   align-items: center;
   gap: 3px;
   color: #d8dcd6;
-}
-
-#language-scroll-help {
-  margin: 12px 0 0;
-  color: #80877f;
-  font-size: 0.68rem;
-  line-height: 1.45;
 }
 
 kbd {

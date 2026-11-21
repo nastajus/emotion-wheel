@@ -819,18 +819,21 @@ sidebarToggle.addEventListener("click", () => {
   setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
 });
 
-document.getElementById("about-open").addEventListener("click", () => {
+function showSidebarAbout() {
   closeLanguageMenu();
   sidebarMain.hidden = true;
   sidebarAbout.hidden = false;
   document.getElementById("about-back").focus();
-});
+}
 
-document.getElementById("about-back").addEventListener("click", () => {
+function showSidebarMain() {
   sidebarAbout.hidden = true;
   sidebarMain.hidden = false;
   document.getElementById("about-open").focus();
-});
+}
+
+document.getElementById("about-open").addEventListener("click", showSidebarAbout);
+document.getElementById("about-back").addEventListener("click", showSidebarMain);
 
 document.getElementById("help-open").addEventListener("click", () => helpDialog.showModal());
 document.getElementById("help-close").addEventListener("click", () => helpDialog.close());
@@ -858,6 +861,11 @@ document.addEventListener("keydown", (event) => {
   }
 
   if (event.key === "Escape") {
+    if (!sidebarAbout.hidden) {
+      event.preventDefault();
+      showSidebarMain();
+      return;
+    }
     hidePopup();
     closeLanguageMenu();
   }
