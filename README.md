@@ -2,7 +2,7 @@
 
 A small, dependency-free SVG emotion wheel built with vanilla HTML, CSS, and JavaScript.
 
-**[Open the live wheel](https://nastajus.github.io/emotional-wheel/)**
+**[Open the live wheel](https://nastajus.github.io/emotion-wheel/)**
 
 ![The rendered emotional wheel](docs/emotion-wheel.png)
 
