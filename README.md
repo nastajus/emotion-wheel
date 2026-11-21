@@ -34,7 +34,8 @@ This project should therefore be understood as an interface and data-visualizati
 - Recalculates navigation bounds from the available viewport, keeping the wheel reachable when the surrounding layout changes size.
 - Distinguishes a stationary click from a drag: click a word to select it and open its popup; drag to pan.
 - Highlights the selected wedge and cycles through adjacent words on the same ring when scrolling over the popup.
-- Expands the popup on demand with English or selected-language definitions.
+- Expands English and selected-language definitions independently, so either or both can be visible.
+- Bundles all definitions with the project for instant lookup without network requests.
 - Switches instantly between English, Spanish, French, German, Lithuanian, Japanese, Simplified Chinese, Russian, Persian, and Vietnamese.
 - Cycles languages by scrolling over the selector without clicking, with continuous first-to-last looping.
 - Filters the scrolling language set with per-language checkmarks plus Check all and Check none controls.
@@ -96,7 +97,7 @@ If a top-level `baseHue` is not supplied, the renderer assigns one by distributi
 
 The renderer was designed with interchangeable trees in mind, but it is not yet a general-purpose hierarchy visualizer. The active version assumes exactly three displayed levels and gives siblings equal angular width. A separate refactor branch explores recursive layout and configuration, but remains unfinished.
 
-Translations are bundled in [`translations.js`](translations.js), so switching languages works offline after the page has loaded. They were developed from machine-assisted drafts with context-specific corrections for ambiguous emotion words. They have not been professionally reviewed in every language; corrections and culturally better equivalents are welcome.
+Translations are bundled in [`translations.js`](translations.js), and the definition catalog is bundled in [`definitions.js`](definitions.js), so switching languages and opening definitions work without runtime network requests. They were developed from machine-assisted drafts with context-specific corrections for ambiguous emotion words. They have not been professionally reviewed in every language; corrections and culturally better equivalents are welcome.
 
 ## Scope and possible directions
 
@@ -104,7 +105,7 @@ The concentric pie model works naturally for Junto- and Willcox-like taxonomies.
 
 Other directions considered during development include:
 
-- **Definitions and word exploration.** The expandable popup loads concise English definitions from the Free Dictionary API and can machine-translate them into the selected language. A basic offline description remains available when the service cannot define a word. Richer usage notes and hand-reviewed definitions remain possible future work.
+- **Definitions and word exploration.** Each emotion has a concise, context-specific English definition and a bundled definition in every supported language. English and the selected language can be expanded independently for side-by-side comparison. Richer usage notes and professionally reviewed definitions remain possible future work.
 - **Deeper localization.** Emotion labels are translated, while the surrounding interface and explanatory text remain in English for now.
 - **Translation fidelity.** Emotion vocabularies do not map one-to-one across languages. Multiple English terms may collapse into one translated word, one term may require a phrase, or a target language may divide the concept differently. Treating those mismatches as data rather than hiding them would make this an interesting language and interface project.
 - **Additional wheel families.** A pluggable renderer could select a concentric hierarchy, a Plutchik-style radial model, or another layout according to the semantics of the source system.
@@ -124,7 +125,6 @@ The three main references should not be ranked on a single informal "scientific"
 - [The Feeling Wheel: A Tool for Expanding Awareness of Emotions and Increasing Spontaneity and Intimacy](https://thefeelingswheel.com/wp-content/uploads/2024/09/willcox1982_feelingswheel.pdf), Gloria Willcox, *Transactional Analysis Journal*, 1982.
 - [PyPlutchik: Visualising and comparing emotion-annotated corpora](https://doi.org/10.1371/journal.pone.0256503), Semeraro et al., *PLOS ONE*, 2021.
 - [Issues in the translation equivalence of basic emotion terms](https://doi.org/10.1016/j.amper.2023.100128), Wierzba et al., *Ampersand*, 2023.
-- [Free Dictionary API](https://dictionaryapi.dev/), on-demand English definitions used by the expanded popup.
 
 ## Project status
 

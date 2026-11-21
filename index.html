@@ -55,14 +55,24 @@
     <div id="popup-label"></div>
     <div id="popup-english"></div>
     <p id="popup-scroll-hint">Scroll here to explore this ring</p>
-    <button id="popup-expand" type="button" aria-expanded="false">More details</button>
-    <div id="popup-details" hidden>
-      <div class="definition-tabs" role="group" aria-label="Definition language">
-        <button id="definition-english" type="button" class="is-active">English</button>
-        <button id="definition-translated" type="button">Selected language</button>
+    <div id="definition-disclosures">
+      <button id="definition-english-toggle" class="definition-toggle" type="button" aria-expanded="false">
+        <span class="definition-symbol" aria-hidden="true">＋</span>
+        English definition
+      </button>
+      <div id="definition-english-panel" class="definition-panel" hidden>
+        <p id="definition-english-text"></p>
       </div>
-      <p id="popup-definition">Choose a definition language.</p>
-      <p class="definition-source">Definitions load on demand from Free Dictionary API. Translations are machine-assisted.</p>
+
+      <button id="definition-translated-toggle" class="definition-toggle" type="button" aria-expanded="false">
+        <span class="definition-symbol" aria-hidden="true">＋</span>
+        <span id="definition-translated-name">Selected language definition</span>
+      </button>
+      <div id="definition-translated-panel" class="definition-panel" hidden>
+        <p id="definition-translated-text"></p>
+      </div>
+
+      <p class="definition-source">Definitions are bundled for instant lookup. Non-English definitions are machine-assisted.</p>
     </div>
   </div>
   <script type="module" src="script.js"></script>

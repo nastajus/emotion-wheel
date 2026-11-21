@@ -167,8 +167,7 @@ h1 {
 #popup-close:focus-visible,
 .language-actions button:focus-visible,
 .language-name:focus-visible,
-.definition-tabs button:focus-visible,
-#popup-expand:focus-visible,
+.definition-toggle:focus-visible,
 .source-note a:focus-visible {
   outline: 2px solid #9bd3bd;
   outline-offset: 2px;
@@ -319,50 +318,57 @@ h1 {
   font-size: 0.7rem;
 }
 
-#popup-expand {
-  margin-top: 14px;
-  padding: 7px 10px;
-  border: 1px solid #b8bbb5;
-  border-radius: 5px;
-  background: #f4f5f1;
-  color: #222;
-  font: inherit;
-  font-size: 0.78rem;
-  cursor: pointer;
-}
-
-#popup-details {
+#definition-disclosures {
   margin-top: 16px;
   padding-top: 14px;
   border-top: 1px solid #d7d9d4;
 }
 
-#popup-details[hidden] { display: none; }
-
-.definition-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-}
-
-.definition-tabs button {
-  min-height: 34px;
+.definition-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  margin-top: 6px;
+  padding: 6px 10px;
   border: 1px solid #b8bbb5;
   border-radius: 4px;
   background: #f4f5f1;
   color: #454842;
+  font: inherit;
   font-size: 0.72rem;
+  text-align: left;
   cursor: pointer;
 }
 
-.definition-tabs button.is-active {
+.definition-toggle[aria-expanded="true"] {
   border-color: #4f7464;
   background: #dcebe4;
   color: #1f3b30;
 }
 
-#popup-definition {
-  margin: 14px 0 0;
+.definition-toggle:disabled {
+  opacity: 0.48;
+  cursor: default;
+}
+
+.definition-symbol {
+  flex: 0 0 auto;
+  width: 1.1em;
+  font-size: 1rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.definition-panel {
+  padding: 10px 10px 4px;
+}
+
+.definition-panel[hidden] { display: none; }
+
+.definition-panel p {
+  margin: 0;
   font-size: 0.92rem;
   line-height: 1.45;
   text-align: left;
@@ -379,6 +385,7 @@ h1 {
 .wheel path.is-active {
   stroke: #fff;
   stroke-width: 3;
+  stroke-linejoin: bevel;
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9));
 }
 

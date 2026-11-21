@@ -6,6 +6,7 @@
 //import { literalEmotionTree } from './emotionTreeDataTest.js';
 import { literalEmotionTree } from './emotionTreeDataJunto.js';
 import { languages, translateEmotion } from './translations.js';
+import { getDefinition } from './definitions.js';
 
 
 // === Option 2: Generated Random Emotion Tree ===
@@ -484,14 +485,14 @@ setupWheelNavigation(emotionContainer, wheelStage, svg);
 const popup = document.getElementById("popup");
 const popupLabel = document.getElementById("popup-label");
 const popupEnglish = document.getElementById("popup-english");
-const popupExpand = document.getElementById("popup-expand");
-const popupDetails = document.getElementById("popup-details");
-const popupDefinition = document.getElementById("popup-definition");
-const definitionEnglish = document.getElementById("definition-english");
-const definitionTranslated = document.getElementById("definition-translated");
-const definitionCache = new Map();
+const definitionEnglishToggle = document.getElementById("definition-english-toggle");
+const definitionEnglishPanel = document.getElementById("definition-english-panel");
+const definitionEnglishText = document.getElementById("definition-english-text");
+const definitionTranslatedToggle = document.getElementById("definition-translated-toggle");
+const definitionTranslatedPanel = document.getElementById("definition-translated-panel");
+const definitionTranslatedText = document.getElementById("definition-translated-text");
+const definitionTranslatedName = document.getElementById("definition-translated-name");
 let selectedNodeId = null;
-let definitionLanguage = "en";
 let lastPopupWheelStep = 0;
 
 function highlightNode(nodeId) {
@@ -515,11 +516,13 @@ function showPopup(label, color, nodeId = selectedNodeId) {
   popup.style.boxShadow = `0 12px 40px rgba(0, 0, 0, 0.35), 0 0 28px ${color}`;
   positionPopup();
   popup.hidden = false;
-  definitionTranslated.textContent = language?.name ?? "Selected language";
-  definitionTranslated.disabled = selectedLanguage === "en";
+  definitionTranslatedName.textContent = `${language?.name ?? "Selected language"} definition`;
+  definitionTranslatedToggle.disabled = selectedLanguage === "en";
+  if (selectedLanguage === "en") {
+    setDefinitionExpanded(definitionTranslatedToggle, definitionTranslatedPanel, false);
+  }
   highlightNode(selectedNodeId);
-
-  if (!popupDetails.hidden) renderDefinition();
+  renderDefinitions();
 }
 
 function positionPopup() {
@@ -560,91 +563,37 @@ popup.addEventListener("wheel", (event) => {
   cycleSelectedNode(event.deltaY > 0 ? 1 : -1);
 }, { passive: false });
 
-popupExpand.addEventListener("click", () => {
-  popupDetails.hidden = !popupDetails.hidden;
-  popupExpand.setAttribute("aria-expanded", String(!popupDetails.hidden));
-  popupExpand.textContent = popupDetails.hidden ? "More details" : "Fewer details";
-  if (!popupDetails.hidden) renderDefinition();
-});
-
-definitionEnglish.addEventListener("click", () => {
-  definitionLanguage = "en";
-  renderDefinition();
-});
-
-definitionTranslated.addEventListener("click", () => {
-  definitionLanguage = selectedLanguage;
-  renderDefinition();
-});
-
-async function fetchEnglishDefinition(label) {
-  const key = `en:${label}`;
-  if (definitionCache.has(key)) return definitionCache.get(key);
-
-  let definition = `A feeling or emotional state described as ${label.toLowerCase()}.`;
-  try {
-    const response = await fetch(
-      `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(label)}`
-    );
-    if (response.ok) {
-      const entries = await response.json();
-      const candidate = entries
-        .flatMap((entry) => entry.meanings ?? [])
-        .flatMap((meaning) => meaning.definitions ?? [])
-        .find((item) => item.definition)?.definition;
-      if (candidate) definition = candidate;
-    }
-  } catch {
-    // The concise fallback keeps details usable offline.
-  }
-
-  definitionCache.set(key, definition);
-  return definition;
+function setDefinitionExpanded(toggle, panel, expanded) {
+  toggle.setAttribute("aria-expanded", String(expanded));
+  toggle.querySelector(".definition-symbol").textContent = expanded ? "−" : "＋";
+  panel.hidden = !expanded;
 }
 
-async function fetchTranslatedDefinition(label, languageCode) {
-  const key = `${languageCode}:${label}`;
-  if (definitionCache.has(key)) return definitionCache.get(key);
+definitionEnglishToggle.addEventListener("click", () => {
+  setDefinitionExpanded(
+    definitionEnglishToggle,
+    definitionEnglishPanel,
+    definitionEnglishToggle.getAttribute("aria-expanded") !== "true"
+  );
+});
 
-  const englishDefinition = await fetchEnglishDefinition(label);
-  try {
-    const endpoint = new URL("https://translate.googleapis.com/translate_a/single");
-    endpoint.search = new URLSearchParams({
-      client: "gtx",
-      sl: "en",
-      tl: languageCode,
-      dt: "t",
-      q: englishDefinition
-    });
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error("Translation request failed");
-    const data = await response.json();
-    const translated = data[0].map((part) => part[0]).join("");
-    definitionCache.set(key, translated);
-    return translated;
-  } catch {
-    return `${englishDefinition} (English definition; translated definition unavailable.)`;
-  }
-}
+definitionTranslatedToggle.addEventListener("click", () => {
+  if (definitionTranslatedToggle.disabled) return;
+  setDefinitionExpanded(
+    definitionTranslatedToggle,
+    definitionTranslatedPanel,
+    definitionTranslatedToggle.getAttribute("aria-expanded") !== "true"
+  );
+});
 
-async function renderDefinition() {
+function renderDefinitions() {
   const label = popup.dataset.englishLabel;
   if (!label) return;
 
-  const requestedLanguage = definitionLanguage === "en" ? "en" : selectedLanguage;
-  definitionLanguage = requestedLanguage;
-  definitionEnglish.classList.toggle("is-active", requestedLanguage === "en");
-  definitionTranslated.classList.toggle("is-active", requestedLanguage !== "en");
-  popupDefinition.dir = requestedLanguage === "fa" ? "rtl" : "ltr";
-  popupDefinition.textContent = "Loading definition…";
-
-  const definition = requestedLanguage === "en"
-    ? await fetchEnglishDefinition(label)
-    : await fetchTranslatedDefinition(label, requestedLanguage);
-
-  if (popup.dataset.englishLabel === label && !popupDetails.hidden) {
-    popupDefinition.textContent = definition;
-  }
+  definitionEnglishText.textContent = getDefinition(label, "en");
+  definitionEnglishText.dir = "ltr";
+  definitionTranslatedText.textContent = getDefinition(label, selectedLanguage);
+  definitionTranslatedText.dir = selectedLanguage === "fa" ? "rtl" : "ltr";
 }
 
 function setLanguage(languageCode) {
